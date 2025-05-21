@@ -1,4 +1,4 @@
-from settings import llm, ba_prompt, ba_instruction
+from settings import llm, graph_maker_prompt
 
 from langchain.agents import initialize_agent, AgentType, Tool
 from langchain.memory import ConversationBufferMemory
@@ -22,34 +22,36 @@ import warnings
 import os
 import re
 
-class BaAgentState(TypedDict):
+class GraphAgentState(TypedDict):
     task: str
+    description: str
     messages: List
     result: str
     questions: List
 
-class BaAgent:
+class GraphAgent:
     def __init__(self):
-        self.ba_agent = self.create_qa_agent()
+        self.graph_agent = self.create_qa_agent()
 
     def create_qa_agent(self):
         ba_agent = create_react_agent(llm, tools=[], checkpointer=MemorySaver())
         return ba_agent
 
-    def run_qa_agent(self, state:BaAgentState, config:dict):
-        print("Status: ba_agent_node")
+    def run_qa_agent(self, state:GraphAgentState, config:dict):
+        print("Status: graph_agent_node")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
             request = state["messages"][-1].content
-            print(f"REQUEST: {request}")
         else:
             old_messages = []
             request = state["task"]
+            print(f"REQUEST: {request}")
+
         request = {
             "messages": [HumanMessage(content=request)]
         }
-        response = self.ba_agent.invoke(request, config=config)
+        response = self.graph_agent.invoke(request, config=config)
         if isinstance(response, dict):
             result = response["messages"][-1].content
         else:
@@ -67,7 +69,7 @@ class BaAgent:
         state["messages"] =  old_messages + [HumanMessage(content=result, name="Аналитик")]
         return state
 
-    def add_message(self, state:BaAgentState, msg:str):
+    def add_message(self, state:GraphAgentState, msg:str):
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
         else:
@@ -75,7 +77,7 @@ class BaAgent:
         state["messages"] = old_messages + [HumanMessage(content=msg)]
         return state
 
-    def get_result(self, state:BaAgentState):
+    def get_result(self, state:GraphAgentState):
         if "result" in state and state["result"]:
             return {
                 "status": "OK",
@@ -92,9 +94,9 @@ class BaAgent:
                 "content": "Возникла ошибка"
             }
 
-    def run(self, msg: str, state:BaAgentState, config:dict):
+    def run(self, msg: str, state:GraphAgentState, config:dict):
         if not "messages" in state or not state["messages"]:
-            state["task"] = ba_prompt.format(task=state["task"], ba_instruction=ba_instruction)
+            state["task"] = graph_maker_prompt.format(task=state["task"], description=state["description"])
         else:
             state = self.add_message(state, msg)
         state = self.run_qa_agent(state, config)
