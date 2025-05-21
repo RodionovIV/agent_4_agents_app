@@ -1,0 +1,10 @@
+version: '3.11'
+
+services:
+  gradio_app:
+    build: .
+    ports:
+      - "36432:36432"
+    volumes:
+      - ./tmp:/app/tmp
+    container_name: gradio_container
