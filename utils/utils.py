@@ -64,6 +64,7 @@ def setup_initial_state():
             "BA": create_filename("business_requirements"),
             "SA": create_filename("system_requirements")
         },
+
         "file_visible_status": False,
         "files_visible": [],
         "results": dict(),
@@ -115,7 +116,7 @@ def postprocess_response(state, response):
     else:
         msg = settings.RESPONSE_STATUS[curent_status]
         state["results"][curent_status] = response["content"]
-        state["md_value"] = response["content"]
+        state["md_value"] = response["content"] + settings.WATEMARK
         state["file_visible_status"] = True
         save_content(response["content"], state["files"][curent_status])
         state["files_visible"].append(state["files"][curent_status])
