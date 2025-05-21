@@ -7,6 +7,7 @@ from utils.cutomLogger import customLogger
 import gradio as gr
 _LOGGER = customLogger.getLogger(__name__)
 AGENTS = create_agents()
+INIT_BAR, _ = update_progress_html(-25)
 
 def run_web_interface():
     with gr.Blocks() as demo:
@@ -26,7 +27,7 @@ def run_web_interface():
             with gr.Column():
                 next_button = gr.Button(scale=1, value=f"Следующий шаг -> 🌐 Граф взаимодействий")
             with gr.Column():
-                progress_html = gr.HTML()
+                progress_html = gr.HTML(INIT_BAR)
         with gr.Row():
             with gr.Column():
                 chat_ui = gr.Chatbot(type="messages", show_label=False)
