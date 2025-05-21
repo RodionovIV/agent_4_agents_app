@@ -3,6 +3,7 @@ from langchain_gigachat.chat_models import GigaChat
 import os
 os.environ["GIGACHAT_CREDENTIALS"] = "Yjc1YWZhNTItMzYwYS00NmU4LTk4YjctZjU4YzAwMDIyMGJmOjJhNWE3YmVhLTAyYzctNGJhNy05NWE3LWEzY2YwNGQzYzZiNw=="
 base_dir = os.path.dirname(os.path.abspath(__file__))
+save_dir = base_dir + "/tmp"
 
 LOG_FILE = "app.log"
 

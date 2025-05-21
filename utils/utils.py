@@ -46,7 +46,6 @@ def setup_initial_state():
     state = {
         "messages": [],
         "md_value": " ",
-        "file_path": settings.SAVE_PATH,
         "agent_states": {
             "DESC": DescAgentState(),
             "GRAPH": GraphAgentState(),
@@ -83,7 +82,7 @@ def create_agents():
 
 def create_filename(prefix):
     datetime_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    return f"{settings.base_dir}/{prefix}_{datetime_str}.md"
+    return f"{settings.save_dir}/{prefix}_{datetime_str}.md"
 
 def router(state):
     cur_status = state["status"]
