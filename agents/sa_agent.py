@@ -1,4 +1,5 @@
 from settings import llm, sa_prompt, sa_instruction
+from utils.cutomLogger import customLogger
 
 from langchain.agents import initialize_agent, AgentType, Tool
 from langchain.memory import ConversationBufferMemory
@@ -22,6 +23,8 @@ import warnings
 import os
 import re
 
+_LOGGER = customLogger.getLogger(__name__)
+
 class SaAgentState(TypedDict):
     task: str
     description: str
@@ -39,12 +42,12 @@ class SaAgent:
         return sa_agent
 
     def run_qa_agent(self, state:SaAgentState, config:dict):
-        print("Status: sa_agent_node")
+        _LOGGER.info("Status: sa_agent_node")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
             request = state["messages"][-1].content
-            print(f"REQUEST: {request}")
+            _LOGGER.info(f"SA REQUEST: {request}")
 
         else:
             old_messages = []
@@ -57,7 +60,7 @@ class SaAgent:
             result = response["messages"][-1].content
         else:
             result = response
-        print(f"RESPONSE: {result}")
+        _LOGGER.info(f"SA RESPONSE: {result}")
         matches = re.findall(r'\[ВОПРОС\](.*?)\[/ВОПРОС\]', result, re.DOTALL)
         if matches:
             ques_string = [

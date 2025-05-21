@@ -4,6 +4,8 @@ import os
 os.environ["GIGACHAT_CREDENTIALS"] = "Yjc1YWZhNTItMzYwYS00NmU4LTk4YjctZjU4YzAwMDIyMGJmOjJhNWE3YmVhLTAyYzctNGJhNy05NWE3LWEzY2YwNGQzYzZiNw=="
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
+LOG_FILE = "app.log"
+
 
 def __read_doc(path):
     with open(path, mode="r") as f:

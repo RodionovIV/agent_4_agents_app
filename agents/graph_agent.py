@@ -1,4 +1,5 @@
 from settings import llm, graph_maker_prompt
+from utils.cutomLogger import customLogger
 
 from langchain.agents import initialize_agent, AgentType, Tool
 from langchain.memory import ConversationBufferMemory
@@ -22,6 +23,8 @@ import warnings
 import os
 import re
 
+_LOGGER = customLogger.getLogger(__name__)
+
 class GraphAgentState(TypedDict):
     task: str
     description: str
@@ -38,7 +41,7 @@ class GraphAgent:
         return ba_agent
 
     def run_qa_agent(self, state:GraphAgentState, config:dict):
-        print("Status: graph_agent_node")
+        _LOGGER.info("Status: graph_agent_node")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
@@ -46,7 +49,7 @@ class GraphAgent:
         else:
             old_messages = []
             request = state["task"]
-            print(f"REQUEST: {request}")
+            _LOGGER.info(f"GRAPH REQUEST: {request}")
 
         request = {
             "messages": [HumanMessage(content=request)]
@@ -56,7 +59,7 @@ class GraphAgent:
             result = response["messages"][-1].content
         else:
             result = response
-        print(f"RESPONSE: {result}")
+        _LOGGER.info(f"GRAPH RESPONSE: {result}")
         matches = re.findall(r'\[ВОПРОС\](.*?)\[/ВОПРОС\]', result, re.DOTALL)
         if matches:
             ques_string = [

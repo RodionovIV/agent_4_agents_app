@@ -2,9 +2,10 @@ import time
 
 import settings
 from utils.utils import router, wrapp_header, update_progress_html, setup_initial_state, create_agents, save_content
+from utils.cutomLogger import customLogger
 
 import gradio as gr
-
+_LOGGER = customLogger.getLogger(__name__)
 AGENTS = create_agents()
 
 def run_web_interface():
@@ -47,10 +48,9 @@ def run_web_interface():
             curent_status = state["status"]
             current_agent = AGENTS[curent_status]
             current_state = state["agent_states"][curent_status]
-            print(current_state)
             current_config = state["configs"][curent_status]
 
-            print(f"CURRENT_AGENT: {curent_status}")
+            _LOGGER.info(f"CURRENT_AGENT: {curent_status}")
             user_msg = {"role":"user", "content":user_input}
             state["messages"].append(user_msg)
             response = current_agent.run(user_input, current_state, current_config)
