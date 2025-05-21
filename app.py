@@ -104,10 +104,6 @@ def run_web_interface():
                     gr.update(value=bar_html),
                     gr.update(**header_params)
                 )
-
-
-
-    # demo.css = css_utils.css_settings
     return demo
 
 if __name__ == "__main__":
