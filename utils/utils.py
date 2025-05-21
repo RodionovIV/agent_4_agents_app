@@ -64,6 +64,7 @@ def setup_initial_state():
             "BA": create_filename("business_requirements"),
             "SA": create_filename("system_requirements")
         },
+        "file_visible_status": False,
         "files_visible": [],
         "results": dict(),
         "status": "DESC",
@@ -102,3 +103,20 @@ def router(state):
     state["status"] = next_status
     return state
 
+def run_agent(current_agent, user_input, current_state, current_config):
+    response = current_agent.run(user_input, current_state, current_config)
+    return response
+
+def postprocess_response(state, response):
+    curent_status = state["status"]
+    state["agent_states"][curent_status] = response["state"]
+    if response["status"] != "OK":
+        msg = response["content"]
+    else:
+        msg = settings.RESPONSE_STATUS[curent_status]
+        state["results"][curent_status] = response["content"]
+        state["md_value"] = response["content"]
+        state["file_visible_status"] = True
+        save_content(response["content"], state["files"][curent_status])
+        state["files_visible"].append(state["files"][curent_status])
+    return msg, state

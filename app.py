@@ -1,7 +1,7 @@
 import time
 
 import settings
-from utils.utils import router, wrapp_header, update_progress_html, setup_initial_state, create_agents, save_content
+from utils.utils import router, wrapp_header, update_progress_html, setup_initial_state, create_agents, run_agent, postprocess_response
 from utils.cutomLogger import customLogger
 
 import gradio as gr
@@ -54,24 +54,10 @@ def run_web_interface():
             _LOGGER.info(f"CURRENT_AGENT: {curent_status}")
             user_msg = {"role":"user", "content":user_input}
             state["messages"].append(user_msg)
-            response = current_agent.run(user_input, current_state, current_config)
-            state["agent_states"][curent_status] = response["state"]
-            if response["status"] != "OK":
-                msg = response["content"]
-            else:
-                msg = settings.RESPONSE_STATUS[curent_status]
-                state["results"][curent_status] = response["content"]
-                state["md_value"] = response["content"]
-                file_visible = True
-                save_content(response["content"], state["files"][curent_status])
-                state["files_visible"].append(state["files"][curent_status])
+            response = run_agent(current_agent, user_input, current_state, current_config)
+            msg, state = postprocess_response(state, response)
             ai_message = {"role": "assistant", "content": msg}
             state["messages"].append(ai_message)
-
-            # if agent_msg == {"role":"assistant", "content":"GOOD"}:
-            #     state["md_value"] = "NONO\n" * 500
-            #     #save_msg(state["messages"])
-            #     file_visible = True
 
             return (
                 "",
