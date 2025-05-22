@@ -24,6 +24,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
  && npm cache clean --force \
  && rm -rf /var/lib/apt/lists/*
 
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
+    PUPPETEER_ARGS="--no-sandbox --disable-setuid-sandbox" \
+    DANGEROUSLY_DISABLE_SANDBOX=1
+
 WORKDIR /app
 
 COPY . /app

@@ -143,4 +143,4 @@ def render_mermaid(_input, _output):
         "-i", _input,
         "-o", _output,
         "-t", "dark"  # или 'dark', 'forest', 'neutral'
-    ])
+    ], check=True)
