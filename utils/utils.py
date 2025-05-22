@@ -6,6 +6,7 @@ from agents.sa_agent import SaAgentState, SaAgent
 
 from uuid import uuid4
 from datetime import datetime
+import subprocess
 
 def save_content(content, filename):
 
@@ -64,7 +65,8 @@ def setup_initial_state():
             "BA": create_filename("business_requirements"),
             "SA": create_filename("system_requirements")
         },
-
+        "mmd": create_filename("mermaid"),
+        "mmd_picture": create_filename("picture"),
         "file_visible_status": False,
         "files_visible": [],
         "results": dict(),
@@ -84,6 +86,10 @@ def create_agents():
 
 def create_filename(prefix):
     datetime_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    if prefix == "mermaid":
+        return f"{settings.save_dir}/{prefix}_{datetime_str}.mmd"
+    elif prefix == "picture":
+        return f"{settings.save_dir}/{prefix}_{datetime_str}.png"
     return f"{settings.save_dir}/{prefix}_{datetime_str}.md"
 
 def router(state):
@@ -121,4 +127,20 @@ def postprocess_response(state, response):
         save_content(response["content"], state["files"][curent_status])
         if state["files"][curent_status] not in state["files_visible"]:
             state["files_visible"].append(state["files"][curent_status])
+        if "mermaid" in response and response["mermaid"]:
+            save_content(response["mermaid"], state["mmd"])
+            try:
+                render_mermaid(state["mmd"], state["mmd_picture"])
+                if state["mmd_picture"] not in state["files_visible"]:
+                    state["files_visible"].append(state["mmd_picture"])
+            except:
+                pass
     return msg, state
+
+def render_mermaid(_input, _output):
+    subprocess.run([
+        "mmdc",
+        "-i", _input,
+        "-o", _output,
+        "-t", "dark"  # или 'dark', 'forest', 'neutral'
+    ])
