@@ -142,5 +142,6 @@ def render_mermaid(_input, _output):
         "mmdc",
         "-i", _input,
         "-o", _output,
-        "-t", "dark"  # или 'dark', 'forest', 'neutral'
+        "-t", "dark",  # или 'dark', 'forest', 'neutral'
+        "--puppeteerConfigFile", "puppeteer-config.json"
     ], check=True)
