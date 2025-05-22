@@ -24,6 +24,7 @@ import os
 import re
 
 _LOGGER = customLogger.getLogger(__name__)
+POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй граф связей заново."
 
 class GraphAgentState(TypedDict):
     task: str
@@ -45,7 +46,7 @@ class GraphAgent:
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
-            request = state["messages"][-1].content
+            request = state["messages"][-1].content + POSTFIX
         else:
             old_messages = []
             request = state["task"]

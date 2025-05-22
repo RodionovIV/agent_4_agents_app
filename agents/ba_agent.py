@@ -24,6 +24,8 @@ import os
 import re
 
 _LOGGER = customLogger.getLogger(__name__)
+POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй бизнес-требования заново."
+
 
 class BaAgentState(TypedDict):
     task: str
@@ -44,7 +46,7 @@ class BaAgent:
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
-            request = state["messages"][-1].content
+            request = state["messages"][-1].content + POSTFIX
             _LOGGER.info(f"BA REQUEST: {request}")
         else:
             old_messages = []

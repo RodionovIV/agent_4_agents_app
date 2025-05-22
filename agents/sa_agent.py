@@ -24,6 +24,8 @@ import os
 import re
 
 _LOGGER = customLogger.getLogger(__name__)
+POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй системную аналитику заново."
+
 
 class SaAgentState(TypedDict):
     task: str
@@ -46,7 +48,7 @@ class SaAgent:
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
-            request = state["messages"][-1].content
+            request = state["messages"][-1].content + POSTFIX
             _LOGGER.info(f"SA REQUEST: {request}")
 
         else:

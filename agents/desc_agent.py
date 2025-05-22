@@ -15,6 +15,8 @@ import os
 import re
 
 _LOGGER = customLogger.getLogger(__name__)
+POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй описание заново."
+
 
 class DescAgentState(TypedDict):
     task: str
@@ -35,7 +37,7 @@ class DescAgent:
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
-            request = state["messages"][-1].content
+            request = state["messages"][-1].content + POSTFIX
             _LOGGER.info(f"REQUEST: {request}")
 
         else:
