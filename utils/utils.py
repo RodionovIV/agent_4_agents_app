@@ -119,5 +119,6 @@ def postprocess_response(state, response):
         state["md_value"] = response["content"] + settings.WATEMARK
         state["file_visible_status"] = True
         save_content(response["content"], state["files"][curent_status])
-        state["files_visible"].append(state["files"][curent_status])
+        if state["files"][curent_status] not in state["files_visible"]:
+            state["files_visible"].append(state["files"][curent_status])
     return msg, state
