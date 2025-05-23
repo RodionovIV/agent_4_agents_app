@@ -45,6 +45,7 @@ def make_config():
 
 def setup_initial_state():
     state = {
+        "init": False,
         "messages": [],
         "md_value": " ",
         "agent_states": {
@@ -54,16 +55,16 @@ def setup_initial_state():
             "SA": SaAgentState()
         },
         "configs": {
-            "DESC": make_config(),
-            "GRAPH": make_config(),
-            "BA": make_config(),
-            "SA": make_config()
+            "DESC": "EMPTY",
+            "GRAPH": "EMPTY",
+            "BA": "EMPTY",
+            "SA": "EMPTY"
         },
         "files": {
-            "DESC": create_filename("description"),
-            "GRAPH": create_filename("graph"),
-            "BA": create_filename("business_requirements"),
-            "SA": create_filename("system_requirements")
+            "DESC": "EMPTY",
+            "GRAPH": "EMPTY",
+            "BA": "EMPTY",
+            "SA": "EMPTY"
         },
         "mmd": create_filename("mermaid"),
         "mmd_picture": create_filename("picture"),

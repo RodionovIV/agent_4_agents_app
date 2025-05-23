@@ -1,6 +1,6 @@
 import settings
 from .cutomLogger import customLogger
-from .utils import create_agents, run_agent, postprocess_response, update_progress_html, router, wrapp_header
+from .utils import create_agents, run_agent, postprocess_response, update_progress_html, router, wrapp_header, create_filename, make_config
 import gradio as gr
 
 _LOGGER = customLogger.getLogger(__name__)
@@ -8,6 +8,25 @@ AGENTS = create_agents()
 
 
 def action_push_submit_button(user_input, state):
+    if not state["init"]:
+        _LOGGER.info("Initialize initial state")
+        state["init"] = True
+        state["configs"]["DESC"] = make_config()
+        state["configs"]["GRAPH"] = make_config()
+        state["configs"]["BA"] = make_config()
+        state["configs"]["SA"] = make_config()
+
+        state["files"]["DESC"] = create_filename("description")
+        state["files"]["GRAPH"] = create_filename("graph")
+        state["files"]["BA"] = create_filename("ba_requirements")
+        state["files"]["SA"] = create_filename("sa_requirements")
+
+        state["mmd"] = create_filename("mermaid")
+        state["mmd_picture"] = create_filename("picture")
+
+        print(state["configs"]["DESC"])
+
+
     curent_status = state["status"]
     current_agent = AGENTS[curent_status]
     current_state = state["agent_states"][curent_status]
