@@ -42,7 +42,7 @@ class BaAgent:
         return ba_agent
 
     def run_qa_agent(self, state:BaAgentState, config:dict):
-        _LOGGER.info("Status: ba_agent_node")
+        _LOGGER.info(f"Status: ba_agent_node, thread_id: {config['configurable']['thread_id']}")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
