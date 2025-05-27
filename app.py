@@ -4,8 +4,11 @@ from utils.back_utils import action_push_submit_button, action_click_next_button
 from utils.cutomLogger import customLogger
 
 import gradio as gr
+from dotenv import load_dotenv
 _LOGGER = customLogger.getLogger(__name__)
-INIT_BAR, _ = update_progress_html(-25)
+INIT_BAR, _ = update_progress_html(-settings.BAR_STEP)
+
+load_dotenv()
 
 def run_web_interface():
     with gr.Blocks() as demo:

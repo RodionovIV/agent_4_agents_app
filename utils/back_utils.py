@@ -62,8 +62,8 @@ def action_click_next_button(state):
     try:
         state = router(state)
         curent_status = state['status']
-        user_msg = {"role": "user", "content": settings.NEXT_TASK[curent_status]}
-        state["messages"].append(user_msg)
+        # user_msg = {"role": "user", "content": settings.NEXT_TASK[curent_status]}
+        # state["messages"].append(user_msg)
         button_params = {
             "value": f"{settings.BUTTON_STATUS[curent_status]}"
         }
@@ -80,14 +80,14 @@ def action_click_next_button(state):
             gr.update(value=bar_html),
             gr.update(**header_params),
         )
-        current_agent = AGENTS[curent_status]
-        current_state = state["agent_states"][curent_status]
-        current_config = state["configs"][curent_status]
-        user_input = ""
-        response = run_agent(current_agent, user_input, current_state, current_config)
-        msg, state = postprocess_response(state, response)
-        ai_message = {"role": "assistant", "content": msg}
-        state["messages"].append(ai_message)
+        # current_agent = AGENTS[curent_status]
+        # current_state = state["agent_states"][curent_status]
+        # current_config = state["configs"][curent_status]
+        # user_input = ""
+        # response = run_agent(current_agent, user_input, current_state, current_config)
+        # msg, state = postprocess_response(state, response)
+        # ai_message = {"role": "assistant", "content": msg}
+        # state["messages"].append(ai_message)
 
         yield (
             gr.update(value=state["messages"]),

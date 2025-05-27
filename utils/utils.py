@@ -25,7 +25,7 @@ def process_msg(msg):
     # return random.choice(msgs)
 
 def update_progress_html(progress):
-    new_progress = min(progress + 25, 100)
+    new_progress = min(progress + 17, 100)
     bar_html = f"""
     <div style='width: 100%; background-color: #eee; border-radius: 10px; overflow: hidden; height: 30px;'>
         <div style='width: {new_progress}%; background-color: #4CAF50; height: 100%; text-align: center; color: white; line-height: 30px;'>
@@ -97,15 +97,19 @@ def router(state):
     cur_status = state["status"]
     if cur_status == "DESC":
         next_status = "GRAPH"
-        state["agent_states"][next_status]["task"] = state["agent_states"][cur_status]["task"]
-        state["agent_states"][next_status]["description"] = state["results"][cur_status]
+        # state["agent_states"][next_status]["task"] = state["agent_states"][cur_status]["task"]
+        # state["agent_states"][next_status]["description"] = state["results"][cur_status]
     elif cur_status == "GRAPH":
         next_status = "BA"
-        state["agent_states"][next_status]["task"] = state["agent_states"][cur_status]["description"]
+        # state["agent_states"][next_status]["task"] = state["agent_states"][cur_status]["description"]
     elif cur_status == "BA":
         next_status = "SA"
-        state["agent_states"][next_status]["description"] = state["results"]["DESC"]
-        state["agent_states"][next_status]["ba_requirements"] = state["results"]["BA"]
+        # state["agent_states"][next_status]["description"] = state["results"]["DESC"]
+        # state["agent_states"][next_status]["ba_requirements"] = state["results"]["BA"]
+    elif cur_status == "SA":
+        next_status = "PL"
+    elif cur_status == "PL":
+        next_status = "CO"
     else:
         raise StopIteration
     state["status"] = next_status
