@@ -42,7 +42,7 @@ class GraphAgent:
         return ba_agent
 
     def run_qa_agent(self, state:GraphAgentState, config:dict):
-        _LOGGER.info("Status: graph_agent_node")
+        _LOGGER.info(f"Status: graph_agent_node, thread_id: {config['configurable']['thread_id']}")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
@@ -85,7 +85,8 @@ class GraphAgent:
         if "result" in state and state["result"]:
             return {
                 "status": "OK",
-                "content": state["result"]
+                "content": state["result"],
+                "mermaid": self.get_mermaid(state["result"])
             }
         elif "questions" in state and state["questions"]:
             return {
@@ -107,6 +108,14 @@ class GraphAgent:
         response = self.get_result(state)
         response["state"] = state
         return response
+
+    def get_mermaid(self, result):
+        matches = re.search(r'```mermaid(.*?)```', result, re.DOTALL)
+        if matches:
+            return matches.group(1)
+        else:
+            return None
+
 
 
 

@@ -7,4 +7,6 @@ services:
       - "36432:36432"
     volumes:
       - ./tmp:/app/tmp
+    security_opt:
+      - seccomp:unconfined
     container_name: gradio_container

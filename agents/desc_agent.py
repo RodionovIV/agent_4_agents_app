@@ -33,7 +33,7 @@ class DescAgent:
         return desc_agent
 
     def run_qa_agent(self, state:DescAgentState, config:dict):
-        _LOGGER.info("Status: desc_agent_node")
+        _LOGGER.info(f"Status: desc_agent_node, thread_id: {config['configurable']['thread_id']}")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
