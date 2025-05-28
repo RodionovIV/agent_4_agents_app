@@ -4,6 +4,14 @@ import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = base_dir + "/tmp"
 puppeteer_config = base_dir + "/configs/puppeteer-config.json"
+tools_dir = base_dir + "/agents/tools/"
+
+# MCP Tools
+planer_mcp_tool = tools_dir + "test_planer_mcp.py"
+coder_mcp_tool = tools_dir + "test_coder_mcp.py"
+git_mcp_tool = tools_dir + "test_git_mcp.py"
+############
+
 
 LOG_FILE = "app.log"
 
