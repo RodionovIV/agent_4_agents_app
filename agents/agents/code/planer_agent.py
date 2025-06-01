@@ -1,10 +1,10 @@
 # Create server parameters for stdio connection
-from agents.tools.tools import client
+from agents.tools.mcp_tools.tools import client
 from utils.cutomLogger import customLogger
 from settings import llm, pl_prompt
 
 from langgraph.prebuilt import create_react_agent
-from langchain.schema import HumanMessage, SystemMessage, Document, AIMessage
+from langchain.schema import HumanMessage
 
 from langgraph.checkpoint.memory import MemorySaver
 

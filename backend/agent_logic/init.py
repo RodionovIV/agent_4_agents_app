@@ -1,10 +1,10 @@
 import settings
-from agents.agents.desc_agent import DescAgentState, DescAgent
-from agents.agents.graph_agent import GraphAgentState, GraphAgent
-from agents.agents.ba_agent import BaAgentState, BaAgent
-from agents.agents.sa_agent import SaAgentState, SaAgent
-from agents.agents.planer_agent import PlAgentState, PlAgent
-from agents.agents.coder_agent import CoAgentState, CoAgent
+from agents.agents.business.desc_agent import DescAgentState, DescAgent
+from agents.agents.business.graph_agent import GraphAgentState, GraphAgent
+from agents.agents.business.ba_agent import BaAgentState, BaAgent
+from agents.agents.business.sa_agent import SaAgentState, SaAgent
+from agents.agents.code.planer_agent import PlAgentState, PlAgent
+from agents.agents.code.coder_agent import CoAgentState, CoAgent
 
 from datetime import datetime
 from uuid import uuid4
