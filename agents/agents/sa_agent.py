@@ -1,4 +1,4 @@
-from settings import llm, ba_prompt, ba_instruction
+from settings import llm, sa_prompt, sa_instruction
 from utils.cutomLogger import customLogger
 
 from langchain.agents import initialize_agent, AgentType, Tool
@@ -24,42 +24,45 @@ import os
 import re
 
 _LOGGER = customLogger.getLogger(__name__)
-POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй бизнес-требования заново."
+POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй системную аналитику заново."
 
 
-class BaAgentState(TypedDict):
+class SaAgentState(TypedDict):
     task: str
+    description: str
+    ba_requirements: str
     messages: List
     result: str
     questions: List
 
-class BaAgent:
+class SaAgent:
     def __init__(self):
-        self.ba_agent = self.create_qa_agent()
+        self.agent = self.create_qa_agent()
 
     def create_qa_agent(self):
-        ba_agent = create_react_agent(llm, tools=[], checkpointer=MemorySaver())
-        return ba_agent
+        agent = create_react_agent(llm, tools=[], checkpointer=MemorySaver())
+        return agent
 
-    def run_qa_agent(self, state:BaAgentState, config:dict):
-        _LOGGER.info(f"Status: ba_agent_node, thread_id: {config['configurable']['thread_id']}")
+    async def run_qa_agent(self, state:SaAgentState, config:dict):
+        _LOGGER.info(f"Status: sa_agent_node, thread_id: {config['configurable']['thread_id']}")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
             request = state["messages"][-1].content + POSTFIX
-            _LOGGER.info(f"BA REQUEST: {request}")
         else:
             old_messages = []
             request = state["task"]
         request = {
             "messages": [HumanMessage(content=request)]
         }
-        response = self.ba_agent.invoke(request, config=config)
+        _LOGGER.info(f"SA REQUEST: {request}")
+        response = await self.agent.ainvoke(request, config=config)
         if isinstance(response, dict):
             result = response["messages"][-1].content
         else:
             result = response
-        _LOGGER.info(f"BA RESPONSE: {result}")
+        _LOGGER.info(f"SA RESPONSE: {result}")
+
         matches = re.findall(r'\[ВОПРОС\](.*?)\[/ВОПРОС\]', result, re.DOTALL)
         if matches:
             ques_string = [
@@ -72,7 +75,7 @@ class BaAgent:
         state["messages"] =  old_messages + [HumanMessage(content=result, name="Аналитик")]
         return state
 
-    def add_message(self, state:BaAgentState, msg:str):
+    def add_message(self, state:SaAgentState, msg:str):
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
         else:
@@ -80,7 +83,7 @@ class BaAgent:
         state["messages"] = old_messages + [HumanMessage(content=msg)]
         return state
 
-    def get_result(self, state:BaAgentState):
+    def get_result(self, state:SaAgentState):
         if "result" in state and state["result"]:
             return {
                 "status": "OK",
@@ -97,12 +100,16 @@ class BaAgent:
                 "content": "Возникла ошибка"
             }
 
-    def run(self, msg: str, state:BaAgentState, config:dict):
+    async def run(self, msg: str, state:SaAgentState, config:dict):
         if not "messages" in state or not state["messages"]:
-            state["task"] = ba_prompt.format(task=state["task"], ba_instruction=ba_instruction)
+            state["task"] = sa_prompt.format(
+                sa_instruction=sa_instruction,
+                ba_requirements=state["ba_requirements"],
+                description=state["description"]
+            )
         else:
             state = self.add_message(state, msg)
-        state = self.run_qa_agent(state, config)
+        state = await self.run_qa_agent(state, config)
         response = self.get_result(state)
         response["state"] = state
         return response
