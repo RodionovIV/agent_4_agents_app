@@ -30,6 +30,8 @@ BA_PROMPT_PATH = "prompts/ba_prompt.txt"
 SA_INSTRUCTION_PATH = "instructions/sa_instruction.md"
 SA_PROMPT_PATH = "prompts/sa_prompt.txt"
 
+PL_PROMPT_PATH = "prompts/planer_prompt.txt"
+
 graph_maker_prompt = __read_doc(GRAPH_PROMPT_PATH)
 
 describer_prompt = __read_doc(DESC_PROMPT_PATH)
@@ -40,6 +42,8 @@ ba_prompt = __read_doc(BA_PROMPT_PATH)
 
 sa_instruction = __read_doc(SA_INSTRUCTION_PATH)
 sa_prompt = __read_doc(SA_PROMPT_PATH)
+
+pl_prompt = __read_doc(PL_PROMPT_PATH)
 
 
 llm = GigaChat(
