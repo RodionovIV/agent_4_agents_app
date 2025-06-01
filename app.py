@@ -1,6 +1,7 @@
 import settings
-from utils.utils import update_progress_html, setup_initial_state
-from utils.back_utils import action_push_submit_button, action_click_next_button
+from backend.agent_logic.init import setup_initial_state
+from backend.agent_logic.in_progress import update_progress_html
+from backend.gradio.actions import action_push_submit_button, action_click_next_button
 from utils.cutomLogger import customLogger
 
 import gradio as gr
