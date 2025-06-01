@@ -1,8 +1,7 @@
 import os, sys
-
-
-from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
+from langchain_gigachat.tools.giga_tool import giga_tool
+
 
 from pathlib import Path
 import re
@@ -11,10 +10,8 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 
-mcp = FastMCP("planer", port="8001")
-
-@mcp.tool()
-def read_instruction(filename):
+@giga_tool()
+def read_instruction(filename:str = Field(description="The path to the readable file.")):
     """
     Use this tool for read instruction and make decisions.
     Choose correct instruction from list and read it.
@@ -42,6 +39,6 @@ def read_instruction(filename):
 #     with open("plan_cool.md", "w") as f:
 #         return f.write(plan)
 
-if __name__ == "__main__":
-    transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
-    mcp.run(transport=transport)
+tools = [
+    read_instruction
+]

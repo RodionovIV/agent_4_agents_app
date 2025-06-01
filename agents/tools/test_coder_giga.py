@@ -1,5 +1,5 @@
-from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
+from langchain_gigachat.tools.giga_tool import giga_tool
 
 from pathlib import Path
 import os, re, sys
@@ -26,9 +26,6 @@ class PythonResult(BaseModel):
 
 _LOGGER = logging.getLogger(__name__)
 
-
-mcp = FastMCP("coder", port="8003")
-
 # @mcp.tool()
 # def read_plan():
 #     """
@@ -38,7 +35,7 @@ mcp = FastMCP("coder", port="8003")
 #     with open("plan_cool.md", "r") as f:
 #         return f.read()
 
-@mcp.tool()
+@giga_tool()
 def save_file(
     file_path: str = Field(description="Путь до файла, в который нужно сохранить содержимое."),
     content: str = Field(description="Информация, которую нужно сохранить в файл."),
@@ -55,7 +52,7 @@ def save_file(
     except Exception as e:
         return SaveResult(status="FAIL", message=f"Не удалось сохранить файл, ошибка: {e}")
 
-@mcp.tool()
+@giga_tool()
 def read_file(
     file_path: str = Field(description="Путь до файла, который нужно прочитать."),
 ) -> ReadResult:
@@ -73,7 +70,7 @@ def read_file(
     except Exception as e:
         return ReadResult(status="FAIL", message=f"Не удалось прочитать файл, ошибка: {e}", result=None)
 
-@mcp.tool()
+@giga_tool()
 def create_dir(
     path: str = Field(description="Путь до директории, которую нужно создать.")
 ) -> MkdirResult:
@@ -87,7 +84,7 @@ def create_dir(
     except:
         return MkdirResult(status="FAIL", message="Не удалось создать директорию")
 
-@mcp.tool()
+@giga_tool()
 def run_python_code(
     code_str: str = Field(description="Строка с Python-кодом, который нужно запустить.")
 ) -> PythonResult:
@@ -104,6 +101,9 @@ def run_python_code(
     except Exception as e:
         return PythonResult(status="FAIL", message=f"Не удалось запустить код, ошибка: {e}")
 
-if __name__ == "__main__":
-    transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
-    mcp.run(transport=transport)
+tools = [
+    save_file,
+    read_file,
+    create_dir,
+    run_python_code
+]

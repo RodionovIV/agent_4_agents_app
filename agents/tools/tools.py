@@ -4,7 +4,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 
 client = MultiServerMCPClient(
     {
-        "planner": {
+        "planer": {
             "transport": "stdio",
             "command": "python",
             "args": [settings.planer_mcp_tool]
