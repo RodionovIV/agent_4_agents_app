@@ -18,6 +18,10 @@ def render_mermaid(_input, _output):
 
 def postprocess_response(state, response):
     curent_status = state["status"]
+    if curent_status == "CO":
+        repo_name = state["agent_states"][curent_status]["repo_name"]
+        msg = settings.RESPONSE_STATUS[curent_status].format(project_name=repo_name)
+        return msg, state
     state["agent_states"][curent_status] = response["state"]
     if response["status"] != "OK":
         msg = response["content"]

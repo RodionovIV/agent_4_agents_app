@@ -14,7 +14,8 @@ def make_config():
         "configurable":
             {
                 "thread_id": str(uuid4())
-            }
+            },
+        "recursion_limit": 100
     }
 
 def create_agents():
@@ -23,8 +24,8 @@ def create_agents():
         "GRAPH": GraphAgent(),
         "BA": BaAgent(),
         "SA": SaAgent(),
-        # "PL": PlAgent(),
-        # "CO": CoAgent()
+        "PL": PlAgent(),
+        "CO": CoAgent()
     }
 
 def create_filename(prefix):

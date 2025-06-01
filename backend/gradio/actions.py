@@ -1,4 +1,5 @@
 import settings
+from agents.agents.code.planer_agent import PlAgent
 from backend.agent_logic.init import create_agents, create_filename, make_config
 from backend.agent_logic.in_progress import update_progress_html, router, wrapp_header, check_state
 from backend.agent_logic.postprocess import postprocess_response
@@ -34,9 +35,6 @@ async def action_push_submit_button(user_input, state):
         state["mmd"] = create_filename("mermaid")
         state["mmd_picture"] = create_filename("picture")
 
-        print(state["configs"]["DESC"])
-
-
     curent_status = state["status"]
     current_agent = AGENTS[curent_status]
     current_state = state["agent_states"][curent_status]
@@ -46,14 +44,21 @@ async def action_push_submit_button(user_input, state):
     if user_input:
         user_msg = {"role": "user", "content": user_input}
         state["messages"].append(user_msg)
-        state["gen_precondition"] = True
+
         current_state = check_state(curent_status, user_input, current_state)
+        if curent_status == "CO" and ("task" not in current_state or not current_state["task"]):
+            ai_message = {"role": "assistant", "content": "Введите план разработки"}
+            state["messages"].append(ai_message)
+        else:
+            print(state)
+            state["gen_precondition"] = True
     else:
         msg = settings.REQUIRED_MSGS[curent_status]
         ai_message = {"role": "assistant", "content": msg}
         state["messages"].append(ai_message)
-    if curent_status == "CO":
-        state["repo_name"] = user_input
+    # if curent_status == "CO":
+    #     state["repo_name"] = user_input
+    #     state["agent_states"]["CO"]["repo_name"] = state["repo_name"]
 
     yield (
         gr.update(value=state["messages"]),

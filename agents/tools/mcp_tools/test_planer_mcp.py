@@ -27,7 +27,9 @@ def read_instruction(filename):
     """
     _LOGGER.info(f" ! read_instruction with argument {filename}")
     with open(filename, "r") as f:
-        return f.read()
+        str = f.read()
+        _LOGGER.info(str)
+        return str
 
 # @mcp.tool()
 # def write_plan(plan):

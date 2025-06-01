@@ -59,7 +59,7 @@ def save_pl_state(state):
     generate = False
     if state["gen_precondition"]:
         state["agent_states"][next_status]["task"] = state["results"]["PL"]
-    generate = True
+        generate = True
     state["gen_precondition"] = generate
     return state
 
@@ -103,7 +103,9 @@ def check_state(cur_status, user_input, current_state):
         if not "task" in current_state or not current_state["task"]:
             current_state["task"] = user_input
     elif cur_status == "CO":
-        if not "task" in current_state or not current_state["task"]:
+        if not "repo_name" in current_state or not current_state["repo_name"]:
+            current_state["repo_name"] = user_input
+        elif not "task" in current_state or not current_state["task"]:
             current_state["task"] = user_input
     return current_state
 

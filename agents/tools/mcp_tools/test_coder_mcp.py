@@ -5,6 +5,8 @@ from pathlib import Path
 import os, re, sys
 import logging
 
+_LOGGER = logging.getLogger(__name__)
+
 from pydantic import BaseModel, Field
 
 class SaveResult(BaseModel):
@@ -27,7 +29,7 @@ class PythonResult(BaseModel):
 _LOGGER = logging.getLogger(__name__)
 
 
-mcp = FastMCP("coder", port="8003")
+mcp = FastMCP("coder")
 
 # @mcp.tool()
 # def read_plan():
@@ -39,12 +41,9 @@ mcp = FastMCP("coder", port="8003")
 #         return f.read()
 
 @mcp.tool()
-def save_file(
-    file_path: str = Field(description="Путь до файла, в который нужно сохранить содержимое."),
-    content: str = Field(description="Информация, которую нужно сохранить в файл."),
-) -> SaveResult:
-    """Use this tool to save the result to a file."""
-    print(f"! save_file to {file_path}, content: {content}")
+def save_file(file_path:str, content:str) -> SaveResult:
+    """Use this tool to save the result to a file. If you can't write to the file, first create the file and then write the contents to it."""
+    _LOGGER.info(f"! save_file to {file_path}, content: {content}")
     try:
         match_python = re.search(r'```python\s*(.*?)\s*```', content, re.DOTALL)
         if match_python:
@@ -56,11 +55,9 @@ def save_file(
         return SaveResult(status="FAIL", message=f"Не удалось сохранить файл, ошибка: {e}")
 
 @mcp.tool()
-def read_file(
-    file_path: str = Field(description="Путь до файла, который нужно прочитать."),
-) -> ReadResult:
+def read_file(file_path: str) -> ReadResult:
     """Use this tool to read information from a file."""
-    print(f"! read_file from {file_path}")
+    _LOGGER.info(f"! read_file from {file_path}")
     try:
         with open(file_path, "r") as f:
             content = f.read()
@@ -74,11 +71,9 @@ def read_file(
         return ReadResult(status="FAIL", message=f"Не удалось прочитать файл, ошибка: {e}", result=None)
 
 @mcp.tool()
-def create_dir(
-    path: str = Field(description="Путь до директории, которую нужно создать.")
-) -> MkdirResult:
+def create_dir(path: str) -> MkdirResult:
     """Use this tool to create a directory."""
-    print(f"! create_dir {path}")
+    _LOGGER.info(f"! create_dir {path}")
     try:
         if Path(path).exists():
             return MkdirResult(status="OK", message="Директория уже существует!")
@@ -88,11 +83,9 @@ def create_dir(
         return MkdirResult(status="FAIL", message="Не удалось создать директорию")
 
 @mcp.tool()
-def run_python_code(
-    code_str: str = Field(description="Строка с Python-кодом, который нужно запустить.")
-) -> PythonResult:
+def run_python_code(code_str: str) -> PythonResult:
     """Use this tool to run Python code."""
-    print(f"! run_python_code {code_str}")
+    _LOGGER.info(f"! run_python_code {code_str}")
     try:
         match_python = re.search(r'```python\s*(.*?)\s*```', code_str, re.DOTALL)
         if match_python:
