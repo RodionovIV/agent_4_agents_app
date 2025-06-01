@@ -4,7 +4,7 @@ import os
 base_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = base_dir + "/tmp"
 puppeteer_config = base_dir + "/configs/puppeteer-config.json"
-tools_dir = base_dir + "/agents/tools/"
+tools_dir = base_dir + "/agents/tools/mcp_tools/"
 
 # MCP Tools
 planer_mcp_tool = tools_dir + "test_planer_mcp.py"
@@ -106,6 +106,14 @@ NEXT_TASK = {
     "SA": "Переходим на этап генерации системных требований",
     "PL": "Переходим на этап генерации плана разработки",
     "CO": "Переходим на этап генерации кода"
+}
+
+REQUIRED_MSGS = {
+    "GRAPH": "Для генерации графа связей необходимо ввести описание процесса",
+    "BA": "Для генерации бизнес-требований необходимо ввести описание процесса",
+    "SA": "Для генерации системных требований необходимо ввести описание процесса",
+    "PL": "Для генерации плана разработки необходимо ввести описание процесса",
+    "CO": "Для генерации кода необходимо ввести план разработки",
 }
 
 WATEMARK = "\n\n*Сгенерировано GigaChat-Max-2*"

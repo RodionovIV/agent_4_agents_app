@@ -1,6 +1,6 @@
 import settings
 from backend.agent_logic.init import create_agents, create_filename, make_config
-from backend.agent_logic.in_progress import update_progress_html, router, wrapp_header
+from backend.agent_logic.in_progress import update_progress_html, router, wrapp_header, check_state
 from backend.agent_logic.postprocess import postprocess_response
 from utils.cutomLogger import customLogger
 import gradio as gr
@@ -43,8 +43,15 @@ async def action_push_submit_button(user_input, state):
     current_config = state["configs"][curent_status]
 
     _LOGGER.info(f"CURRENT_AGENT: {curent_status}")
-    user_msg = {"role": "user", "content": user_input}
-    state["messages"].append(user_msg)
+    if user_input:
+        user_msg = {"role": "user", "content": user_input}
+        state["messages"].append(user_msg)
+        state["gen_precondition"] = True
+        current_state = check_state(curent_status, user_input, current_state)
+    else:
+        msg = settings.REQUIRED_MSGS[curent_status]
+        ai_message = {"role": "assistant", "content": msg}
+        state["messages"].append(ai_message)
     if curent_status == "CO":
         state["repo_name"] = user_input
 
@@ -55,19 +62,19 @@ async def action_push_submit_button(user_input, state):
         gr.update(value=state["files_visible"], visible=state["file_visible_status"]),
         ""
     )
+    if state["gen_precondition"]:
+        response = await run_agent(current_agent, user_input, current_state, current_config)
+        msg, state = postprocess_response(state, response)
+        ai_message = {"role": "assistant", "content": msg}
+        state["messages"].append(ai_message)
 
-    response = await run_agent(current_agent, user_input, current_state, current_config)
-    msg, state = postprocess_response(state, response)
-    ai_message = {"role": "assistant", "content": msg}
-    state["messages"].append(ai_message)
-
-    yield (
-        gr.update(value=state["messages"]),
-        gr.update(value=state),
-        gr.update(value=state["md_value"]),
-        gr.update(value=state["files_visible"], visible=state["file_visible_status"]),
-        ""
-    )
+        yield (
+            gr.update(value=state["messages"]),
+            gr.update(value=state),
+            gr.update(value=state["md_value"]),
+            gr.update(value=state["files_visible"], visible=state["file_visible_status"]),
+            ""
+        )
 
 async def action_click_next_button(state):
     bar_html, state["progress"] = update_progress_html(state["progress"])
@@ -96,15 +103,17 @@ async def action_click_next_button(state):
             gr.update(value=bar_html),
             gr.update(**header_params),
         )
+        _LOGGER.info(f"Current status {curent_status}, gen_precondition: {state['gen_precondition']}")
         if curent_status in {"GRAPH", "BA", "SA", "PL"}:
             current_agent = AGENTS[curent_status]
             current_state = state["agent_states"][curent_status]
             current_config = state["configs"][curent_status]
             user_input = ""
-            response = await run_agent(current_agent, user_input, current_state, current_config)
-            msg, state = postprocess_response(state, response)
-            ai_message = {"role": "assistant", "content": msg}
-            state["messages"].append(ai_message)
+            if state["gen_precondition"]:
+                response = await run_agent(current_agent, user_input, current_state, current_config)
+                msg, state = postprocess_response(state, response)
+                ai_message = {"role": "assistant", "content": msg}
+                state["messages"].append(ai_message)
 
         yield (
             gr.update(value=state["messages"]),

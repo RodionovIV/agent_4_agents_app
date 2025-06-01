@@ -1,4 +1,3 @@
-# Create server parameters for stdio connection
 from agents.tools.mcp_tools.tools import client
 from utils.cutomLogger import customLogger
 from settings import llm, pl_prompt

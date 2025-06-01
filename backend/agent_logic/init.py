@@ -23,8 +23,8 @@ def create_agents():
         "GRAPH": GraphAgent(),
         "BA": BaAgent(),
         "SA": SaAgent(),
-        "PL": PlAgent(),
-        "CO": CoAgent()
+        # "PL": PlAgent(),
+        # "CO": CoAgent()
     }
 
 def create_filename(prefix):
@@ -72,6 +72,7 @@ def setup_initial_state():
         "status": "DESC",
         "status_iterator": iter(settings.NEXT_STATUS_LIST),
         "progress": 0,
-        "repo_name": "EMPTY"
+        "repo_name": "EMPTY",
+        "gen_precondition": False
     }
     return state
