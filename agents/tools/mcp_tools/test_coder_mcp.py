@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 import os, re, sys
 import logging
+import black
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +27,19 @@ class PythonResult(BaseModel):
     status: str = Field(description="Статус запуска Python-кода")
     message: str = Field(description="Сообщение о результате запуска Python-кода.")
 
+
+def format_text(content, filename):
+    if filename.endswith(".py"):
+        match_python = re.search(r'```python\s*(.*?)\s*```', content, re.DOTALL)
+        if match_python:
+            content = match_python.group(1)
+        content = content.encode().decode("unicode_escape")
+        content = black.format_str(content, mode=black.Mode())
+    else:
+        content = content.replace("\\n", "\n")
+        content = content.replace("\n", "\n")
+    return content
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -45,9 +59,11 @@ def save_file(file_path:str, content:str) -> SaveResult:
     """Use this tool to save the result to a file. If you can't write to the file, first create the file and then write the contents to it."""
     _LOGGER.info(f"! save_file to {file_path}, content: {content}")
     try:
-        match_python = re.search(r'```python\s*(.*?)\s*```', content, re.DOTALL)
-        if match_python:
-            content = match_python.group(1)
+        try:
+            content = format_text(content, file_path)
+        except:
+            pass
+
         with open(file_path, "w") as f:
             f.write(content)
         return SaveResult(status="OK", message="Файл успешно сохранен!")
