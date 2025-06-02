@@ -7,6 +7,9 @@ services:
       - "36432:36432"
     volumes:
       - ./tmp:/app/tmp
+      - ./app.log:/app/app.log
+      - ${SANDBOX_REPO}:/app/sandbox
+      - ~/.ssh:/root/.ssh:ro
     security_opt:
       - seccomp:unconfined
     container_name: gradio_container
