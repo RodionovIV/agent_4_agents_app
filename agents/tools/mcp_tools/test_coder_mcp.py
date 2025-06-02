@@ -82,20 +82,20 @@ def create_dir(path: str) -> MkdirResult:
     except:
         return MkdirResult(status="FAIL", message="Не удалось создать директорию")
 
-@mcp.tool()
-def run_python_code(code_str: str) -> PythonResult:
-    """Use this tool to run Python code."""
-    _LOGGER.info(f"! run_python_code {code_str}")
-    try:
-        match_python = re.search(r'```python\s*(.*?)\s*```', code_str, re.DOTALL)
-        if match_python:
-            code = match_python.group(1)
-            result = exec(code)
-        else:
-            return PythonResult(status="FAIL", message="Не удалось выделить информацию из блока ```python[code]```.")
-        return PythonResult(status="OK", message=f"Код успешно запущен! Результат: {result}")
-    except Exception as e:
-        return PythonResult(status="FAIL", message=f"Не удалось запустить код, ошибка: {e}")
+# @mcp.tool()
+# def run_python_code(code_str: str) -> PythonResult:
+#     """Use this tool to run Python code."""
+#     _LOGGER.info(f"! run_python_code {code_str}")
+#     try:
+#         match_python = re.search(r'```python\s*(.*?)\s*```', code_str, re.DOTALL)
+#         if match_python:
+#             code = match_python.group(1)
+#             result = exec(code)
+#         else:
+#             return PythonResult(status="FAIL", message="Не удалось выделить информацию из блока ```python[code]```.")
+#         return PythonResult(status="OK", message=f"Код успешно запущен! Результат: {result}")
+#     except Exception as e:
+#         return PythonResult(status="FAIL", message=f"Не удалось запустить код, ошибка: {e}")
 
 if __name__ == "__main__":
     transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
