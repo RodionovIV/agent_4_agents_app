@@ -32,7 +32,9 @@ class BaAgent:
 
     async def run_qa_agent(self, state:BaAgentState, config:dict):
         _LOGGER.info(f"Status: ba_agent_node, thread_id: {config['configurable']['thread_id']}")
-        state["questions"] = ""
+        flag:bool = False
+        if "questions" in state and state["questions"]:
+            flag = True
 
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
@@ -53,7 +55,7 @@ class BaAgent:
             result = response
         _LOGGER.info(f"BA RESPONSE: {result}")
         matches = re.findall(r'\[ВОПРОС\](.*?)\[/ВОПРОС\]', result, re.DOTALL)
-        if matches:
+        if matches and not flag:
             ques_string = [
                 f"{i+1}. {s}"
                 for i, s in enumerate(matches)

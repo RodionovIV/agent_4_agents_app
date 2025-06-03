@@ -32,7 +32,10 @@ class GraphAgent:
 
     async def run_qa_agent(self, state:GraphAgentState, config:dict):
         _LOGGER.info(f"Status: graph_agent_node, thread_id: {config['configurable']['thread_id']}")
-        state["questions"] = ""
+        flag: bool = False
+        if "questions" in state and state["questions"]:
+            flag = True
+
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
             request = state["messages"][-1].content + POSTFIX
@@ -51,7 +54,7 @@ class GraphAgent:
             result = response
         _LOGGER.info(f"GRAPH RESPONSE: {result}")
         matches = re.findall(r'\[ВОПРОС\](.*?)\[/ВОПРОС\]', result, re.DOTALL)
-        if matches:
+        if matches and not flag:
             ques_string = [
                 f"{i+1}. {s}"
                 for i, s in enumerate(matches)
