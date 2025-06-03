@@ -1,0 +1,33 @@
+apt_packages:
+  - curl
+  - ca-certificates
+  - git
+  - build-essential
+  - libnss3
+  - libxss1
+  - libasound2
+  - libxtst6
+  - libgbm1
+  - libgtk-3-0
+  - libgdk-pixbuf2.0-0
+  - libgl1
+  - fonts-freefont-ttf
+  - fontconfig
+  - chromium
+  - nodejs  # установлен после добавления репозитория NodeSource
+
+npm_global_packages:
+  - @mermaid-js/mermaid-cli
+
+pip_requirements_file:
+  - requirements.txt
+
+env_variables:
+  PUPPETEER_EXECUTABLE_PATH: "/usr/bin/chromium"
+  PUPPETEER_ARGS: "--no-sandbox --disable-setuid-sandbox"
+  DANGEROUSLY_DISABLE_SANDBOX: "1"
+
+git_config:
+  user.name: "RodionovIV"
+  user.email: "mr.ts777@yandex.ru"
+  safe.directory: "/app/sandbox"
