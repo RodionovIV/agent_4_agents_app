@@ -35,4 +35,8 @@ COPY . /app
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
+RUN git config --global --add safe.directory /app/sandbox
+RUN git config --global user.email "mr.ts777@yandex.ru"
+RUN git config --global user.name "RodionovIV"
+
 CMD ["python", "app.py"]

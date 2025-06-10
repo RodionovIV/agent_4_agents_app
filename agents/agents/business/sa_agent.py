@@ -1,11 +1,20 @@
-from settings import llm, describer_prompt, instruments
+from settings import llm, sa_prompt, sa_instruction
 from utils.cutomLogger import customLogger
+
+from langchain.agents import initialize_agent, AgentType, Tool
+from langchain.memory import ConversationBufferMemory
+from langgraph.graph import StateGraph
+from langchain.chat_models import ChatOpenAI
+from langchain_gigachat.chat_models import GigaChat
 from langchain.schema import HumanMessage, SystemMessage, Document, AIMessage
-
+from langchain.vectorstores import FAISS
+from langchain.embeddings import SentenceTransformerEmbeddings
 from langchain.chains import RetrievalQA
-
+from langchain_community.tools import DuckDuckGoSearchRun
+from langgraph.types import Command
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import StateGraph, END, MessagesState, START
 from typing import TypedDict, Optional, Literal, List, Dict
 from typing_extensions import TypedDict
 
@@ -15,43 +24,45 @@ import os
 import re
 
 _LOGGER = customLogger.getLogger(__name__)
-POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй описание заново."
+POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй системную аналитику заново."
 
 
-class DescAgentState(TypedDict):
+class SaAgentState(TypedDict):
     task: str
+    description: str
+    ba_requirements: str
     messages: List
-    questions: str
     result: str
+    questions: List
 
-class DescAgent:
+class SaAgent:
     def __init__(self):
-        self.desc_agent = self.create_qa_agent()
+        self.agent = self.create_qa_agent()
 
     def create_qa_agent(self):
-        desc_agent = create_react_agent(llm, tools=[], checkpointer=MemorySaver())
-        return desc_agent
+        agent = create_react_agent(llm, tools=[], checkpointer=MemorySaver())
+        return agent
 
-    def run_qa_agent(self, state:DescAgentState, config:dict):
-        _LOGGER.info(f"Status: desc_agent_node, thread_id: {config['configurable']['thread_id']}")
+    async def run_qa_agent(self, state:SaAgentState, config:dict):
+        _LOGGER.info(f"Status: sa_agent_node, thread_id: {config['configurable']['thread_id']}")
         state["questions"] = ""
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
             request = state["messages"][-1].content + POSTFIX
-            _LOGGER.info(f"REQUEST: {request}")
-
         else:
             old_messages = []
             request = state["task"]
         request = {
             "messages": [HumanMessage(content=request)]
         }
-        response = self.desc_agent.invoke(request, config=config)
+        _LOGGER.info(f"SA REQUEST: {request}")
+        response = await self.agent.ainvoke(request, config=config)
         if isinstance(response, dict):
             result = response["messages"][-1].content
         else:
             result = response
-        _LOGGER.info(f"DESC RESPONSE: {result}")
+        _LOGGER.info(f"SA RESPONSE: {result}")
+
         matches = re.findall(r'\[ВОПРОС\](.*?)\[/ВОПРОС\]', result, re.DOTALL)
         if matches:
             ques_string = [
@@ -64,7 +75,7 @@ class DescAgent:
         state["messages"] =  old_messages + [HumanMessage(content=result, name="Аналитик")]
         return state
 
-    def add_message(self, state:DescAgentState, msg:str):
+    def add_message(self, state:SaAgentState, msg:str):
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
         else:
@@ -72,7 +83,7 @@ class DescAgent:
         state["messages"] = old_messages + [HumanMessage(content=msg)]
         return state
 
-    def get_result(self, state:DescAgentState):
+    def get_result(self, state:SaAgentState):
         if "result" in state and state["result"]:
             return {
                 "status": "OK",
@@ -89,12 +100,16 @@ class DescAgent:
                 "content": "Возникла ошибка"
             }
 
-    def run(self, msg: str, state:DescAgentState, config:dict):
+    async def run(self, msg: str, state:SaAgentState, config:dict):
         if not "messages" in state or not state["messages"]:
-            state["task"] = describer_prompt.format(task=msg, instruments=instruments)
+            state["task"] = sa_prompt.format(
+                sa_instruction=sa_instruction,
+                ba_requirements=state["ba_requirements"],
+                description=state["description"]
+            )
         else:
             state = self.add_message(state, msg)
-        state = self.run_qa_agent(state, config)
+        state = await self.run_qa_agent(state, config)
         response = self.get_result(state)
         response["state"] = state
         return response
