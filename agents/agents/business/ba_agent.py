@@ -38,7 +38,12 @@ class BaAgent:
 
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
-            request = state["messages"][-1].content + POSTFIX
+            len_human_messages = len([1 for msg in old_messages if isinstance(msg, HumanMessage)])
+            tmp_msg = state["messages"][-1].content
+            if len_human_messages > 2:
+                request = tmp_msg + POSTFIX
+            else:
+                request = f"Ответы на вопросы: {tmp_msg}"
         else:
             old_messages = []
             request = state["task"]
