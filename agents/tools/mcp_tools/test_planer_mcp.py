@@ -1,17 +1,15 @@
-import os, sys
+import sys
 
 
 from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel, Field
 
-from pathlib import Path
-import re
 import logging
 
 _LOGGER = logging.getLogger(__name__)
 
 
 mcp = FastMCP("planer", port="8001")
+
 
 @mcp.tool()
 def read_instruction(filename):
@@ -30,6 +28,7 @@ def read_instruction(filename):
         str = f.read()
         _LOGGER.info(str)
         return str
+
 
 # @mcp.tool()
 # def write_plan(plan):

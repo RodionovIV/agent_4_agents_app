@@ -5,7 +5,7 @@ import settings
 
 class customLogger:
     @classmethod
-    def getLogger(cls, name:str):
+    def getLogger(cls, name: str):
         logger = logging.getLogger(name)
         logger.setLevel(logging.INFO)
         fh = logging.FileHandler(settings.LOG_FILE)

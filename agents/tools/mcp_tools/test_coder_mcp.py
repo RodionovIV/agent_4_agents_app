@@ -2,26 +2,30 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 from pathlib import Path
-import os, re, sys
+import re
+import sys
 import logging
 import black
 
 _LOGGER = logging.getLogger(__name__)
 
-from pydantic import BaseModel, Field
+
 
 class SaveResult(BaseModel):
     status: str = Field(description="Статус сохранения файла")
     message: str = Field(description="Сообщение о результате сохранения в файл")
+
 
 class ReadResult(BaseModel):
     status: str = Field(description="Статус чтения файла")
     message: str = Field(description="Сообщение о результате чтения файла")
     result: str = Field(description="Содержимое файла")
 
+
 class MkdirResult(BaseModel):
     status: str = Field(description="Статус создания директории")
     message: str = Field(description="Сообщение о результате создания директории")
+
 
 class PythonResult(BaseModel):
     status: str = Field(description="Статус запуска Python-кода")
@@ -30,7 +34,7 @@ class PythonResult(BaseModel):
 
 def format_text(content, filename):
     if filename.endswith(".py"):
-        match_python = re.search(r'```python\s*(.*?)\s*```', content, re.DOTALL)
+        match_python = re.search(r"```python\s*(.*?)\s*```", content, re.DOTALL)
         if match_python:
             content = match_python.group(1)
         content = content.encode().decode("unicode_escape")
@@ -39,6 +43,7 @@ def format_text(content, filename):
         content = content.replace("\\n", "\n")
         content = content.replace("\n", "\n")
     return content
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,8 +59,9 @@ mcp = FastMCP("coder")
 #     with open("plan_cool.md", "r") as f:
 #         return f.read()
 
+
 @mcp.tool()
-def save_file(file_path:str, content:str) -> SaveResult:
+def save_file(file_path: str, content: str) -> SaveResult:
     """Use this tool to save the result to a file. If you can't write to the file, first create the file and then write the contents to it."""
     _LOGGER.info(f"! save_file to {file_path}, content: {content}")
     try:
@@ -68,7 +74,10 @@ def save_file(file_path:str, content:str) -> SaveResult:
             f.write(content)
         return SaveResult(status="OK", message="Файл успешно сохранен!")
     except Exception as e:
-        return SaveResult(status="FAIL", message=f"Не удалось сохранить файл, ошибка: {e}")
+        return SaveResult(
+            status="FAIL", message=f"Не удалось сохранить файл, ошибка: {e}"
+        )
+
 
 @mcp.tool()
 def read_file(file_path: str) -> ReadResult:
@@ -78,13 +87,15 @@ def read_file(file_path: str) -> ReadResult:
         with open(file_path, "r") as f:
             content = f.read()
         if file_path.endswith(".py"):
-            content = (
-                "```python\n"
-                f"{content}"
-                "\n```")
+            content = f"```python\n{content}\n```"
         return ReadResult(status="OK", message="Файл успешно прочитан!", result=content)
     except Exception as e:
-        return ReadResult(status="FAIL", message=f"Не удалось прочитать файл, ошибка: {e}", result=None)
+        return ReadResult(
+            status="FAIL",
+            message=f"Не удалось прочитать файл, ошибка: {e}",
+            result=None,
+        )
+
 
 @mcp.tool()
 def create_dir(path: str) -> MkdirResult:
@@ -97,6 +108,7 @@ def create_dir(path: str) -> MkdirResult:
         return MkdirResult(status="OK", message="Директория успешно создана!")
     except:
         return MkdirResult(status="FAIL", message="Не удалось создать директорию")
+
 
 # @mcp.tool()
 # def run_python_code(code_str: str) -> PythonResult:
