@@ -6,7 +6,11 @@ from langgraph.checkpoint.memory import MemorySaver
 from typing import TypedDict, List
 from typing_extensions import TypedDict
 
-import re
+from abstract.abstract_agent import AbstractAgent
+from agents.utils.parser import Parser
+from agents.utils.text_formatter import TextFormatter
+from agents.utils.result_formatter import ResultFormatter
+
 
 _LOGGER = customLogger.getLogger(__name__)
 POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй граф связей заново."
@@ -20,17 +24,18 @@ class GraphAgentState(TypedDict):
     questions: List
 
 
-class GraphAgent:
+class GraphAgent(AbstractAgent):
     def __init__(self):
-        self.agent = self.create_qa_agent()
+        self.agent = self.create_agent()
 
-    def create_qa_agent(self):
+    def create_agent(self):
         agent = create_react_agent(llm, tools=[], checkpointer=MemorySaver())
         return agent
 
-    async def run_qa_agent(self, state: GraphAgentState, config: dict):
+    async def run_agent(self, state: GraphAgentState, config: dict):
+        class_name = self.__class__.__name__.lower()
         _LOGGER.info(
-            f"Status: graph_agent_node, thread_id: {config['configurable']['thread_id']}"
+            f"Status: {class_name}, thread_id: {config['configurable']['thread_id']}"
         )
         flag: bool = False
         if "questions" in state and state["questions"]:
@@ -38,23 +43,26 @@ class GraphAgent:
 
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
-            request = state["messages"][-1].content + POSTFIX
+            request = TextFormatter.question_agent_request(old_messages, POSTFIX, state)
         else:
             old_messages = []
             request = state["task"]
-        _LOGGER.info(f"GRAPH REQUEST: {request}")
 
-        request = {"messages": [HumanMessage(content=request)]}
+        _LOGGER.info(f"{class_name}_request: {request}")
+
+        request = TextFormatter.agent_request(request)
+
         response = await self.agent.ainvoke(request, config=config)
         if isinstance(response, dict):
             result = response["messages"][-1].content
         else:
             result = response
-        _LOGGER.info(f"GRAPH RESPONSE: {result}")
-        matches = re.findall(r"\[ВОПРОС\](.*?)\[/ВОПРОС\]", result, re.DOTALL)
+        _LOGGER.info(f"{class_name}_response: {result}")
+
+        matches = Parser.parse_question(result)
         if matches and not flag:
-            ques_string = [f"{i + 1}. {s}" for i, s in enumerate(matches)]
-            state["questions"] = "Возникли вопросы:\n" + "\n".join(ques_string)
+            questions = TextFormatter.format_questions(matches)
+            state["questions"] = "Возникли вопросы:\n" + "\n".join(questions)
         else:
             state["result"] = result
         state["messages"] = old_messages + [
@@ -62,41 +70,14 @@ class GraphAgent:
         ]
         return state
 
-    def add_message(self, state: GraphAgentState, msg: str):
-        if "messages" in state and state["messages"]:
-            old_messages = state["messages"]
-        else:
-            old_messages = []
-        state["messages"] = old_messages + [HumanMessage(content=msg)]
-        return state
-
-    def get_result(self, state: GraphAgentState):
-        if "result" in state and state["result"]:
-            return {
-                "status": "OK",
-                "content": state["result"],
-                "mermaid": self.get_mermaid(state["result"]),
-            }
-        elif "questions" in state and state["questions"]:
-            return {"status": "QUES", "content": state["questions"]}
-        else:
-            return {"status": "FAIL", "content": "Возникла ошибка"}
-
     async def run(self, msg: str, state: GraphAgentState, config: dict):
         if "messages" not in state or not state["messages"]:
             state["task"] = graph_maker_prompt.format(
                 task=state["task"], description=state["description"]
             )
         else:
-            state = self.add_message(state, msg)
-        state = await self.run_qa_agent(state, config)
-        response = self.get_result(state)
+            state = TextFormatter.add_message(state, msg)
+        state = await self.run_agent(state, config)
+        response = ResultFormatter.get_result_mermaid(state)
         response["state"] = state
         return response
-
-    def get_mermaid(self, result):
-        matches = re.search(r"```mermaid(.*?)```", result, re.DOTALL)
-        if matches:
-            return matches.group(1)
-        else:
-            return None
