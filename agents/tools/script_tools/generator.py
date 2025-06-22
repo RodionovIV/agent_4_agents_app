@@ -179,11 +179,14 @@ class Generator:
         nodes_code_list = []
         for node in graph.get("nodes", []):
             agent = node.get("name")
-            node_name = (
-                "agent_orchestrator" if agent == "orchestrator" else "agent_with_tools"
-            )
-            node_template = agent_node_templates[node_name]
             direction = node.get("to")
+            if agent == "orchestrator":
+                node_name = "agent_orchestrator"
+                direction = [x.strip() for x in direction.split(",")]
+            else:
+                node_name = "agent_with_tools"
+            node_template = agent_node_templates[node_name]
+
             node_str = node_template(agent, direction)
 
             nodes_code_list += [node_str]
