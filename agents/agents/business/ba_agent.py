@@ -8,7 +8,7 @@ from typing import TypedDict, List
 from typing_extensions import TypedDict
 from agents.utils.parser import Parser
 from agents.utils.text_formatter import TextFormatter
-from agents.utils.result import ParseResult
+from agents.utils.result_formatter import ResultFormatter
 
 
 _LOGGER = customLogger.getLogger(__name__)
@@ -76,6 +76,6 @@ class BaAgent(AbstractAgent):
         else:
             state = TextFormatter.add_message(state, msg)
         state = await self.run_agent(state, config)
-        response = ParseResult.get_result(state)
+        response = ResultFormatter.get_result(state)
         response["state"] = state
         return response

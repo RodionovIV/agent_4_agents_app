@@ -1,7 +1,7 @@
 from typing import TypedDict, Dict
 
 
-class ParseResult:
+class ResultFormatter:
     @staticmethod
     def get_result(state: TypedDict) -> Dict[str, str]:
         if "result" in state and state["result"]:
