@@ -9,7 +9,6 @@ from typing_extensions import TypedDict
 from agents.utils.parser import Parser
 from agents.utils.text_formatter import TextFormatter
 from agents.utils.result import ParseResult
-import re
 
 
 _LOGGER = customLogger.getLogger(__name__)
@@ -56,7 +55,7 @@ class BaAgent(AbstractAgent):
             result = response["messages"][-1].content
         else:
             result = response
-        _LOGGER.info(f"{class_name}_request: {result}")
+        _LOGGER.info(f"{class_name}_response: {result}")
 
         matches = Parser.parse_question(result)
         if matches and not flag:
@@ -69,21 +68,13 @@ class BaAgent(AbstractAgent):
         ]
         return state
 
-    def add_message(self, state: BaAgentState, msg: str):
-        if "messages" in state and state["messages"]:
-            old_messages = state["messages"]
-        else:
-            old_messages = []
-        state["messages"] = old_messages + [HumanMessage(content=msg)]
-        return state
-
     async def run(self, msg: str, state: BaAgentState, config: dict):
         if "messages" not in state or not state["messages"]:
             state["task"] = ba_prompt.format(
                 task=state["task"], ba_instruction=ba_instruction
             )
         else:
-            state = self.add_message(state, msg)
+            state = TextFormatter.add_message(state, msg)
         state = await self.run_agent(state, config)
         response = ParseResult.get_result(state)
         response["state"] = state
