@@ -9,14 +9,10 @@ from agents.agents.code.coder_agent import CoAgentState, CoAgent
 from datetime import datetime
 from uuid import uuid4
 
+
 def make_config():
-    return {
-        "configurable":
-            {
-                "thread_id": str(uuid4())
-            },
-        "recursion_limit": 100
-    }
+    return {"configurable": {"thread_id": str(uuid4())}, "recursion_limit": 100}
+
 
 def create_agents():
     return {
@@ -25,8 +21,9 @@ def create_agents():
         "BA": BaAgent(),
         "SA": SaAgent(),
         "PL": PlAgent(),
-        "CO": CoAgent()
+        "CO": CoAgent(),
     }
+
 
 def create_filename(prefix):
     datetime_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -35,6 +32,7 @@ def create_filename(prefix):
     elif prefix == "picture":
         return f"{settings.save_dir}/{prefix}_{datetime_str}.png"
     return f"{settings.save_dir}/{prefix}_{datetime_str}.md"
+
 
 def setup_initial_state():
     state = {
@@ -47,7 +45,7 @@ def setup_initial_state():
             "BA": BaAgentState(),
             "SA": SaAgentState(),
             "PL": PlAgentState(),
-            "CO": CoAgentState()
+            "CO": CoAgentState(),
         },
         "configs": {
             "DESC": "EMPTY",
@@ -56,14 +54,14 @@ def setup_initial_state():
             "SA": "EMPTY",
             "PL": "EMPTY",
             "CO": "EMPTY",
-            "GIT": "EMPTY"
+            "GIT": "EMPTY",
         },
         "files": {
             "DESC": "EMPTY",
             "GRAPH": "EMPTY",
             "BA": "EMPTY",
             "SA": "EMPTY",
-            "PL": "EMPTY"
+            "PL": "EMPTY",
         },
         "mmd": "EMPTY",
         "mmd_picture": "EMPTY",
@@ -74,6 +72,6 @@ def setup_initial_state():
         "status_iterator": iter(settings.NEXT_STATUS_LIST),
         "progress": 0,
         "repo_name": "EMPTY",
-        "gen_precondition": False
+        "gen_precondition": False,
     }
     return state

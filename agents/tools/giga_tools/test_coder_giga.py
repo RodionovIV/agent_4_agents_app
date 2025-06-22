@@ -2,27 +2,31 @@ from pydantic import BaseModel, Field
 from langchain_gigachat.tools.giga_tool import giga_tool
 
 from pathlib import Path
-import os, re, sys
+import re
 import logging
 
-from pydantic import BaseModel, Field
+
 
 class SaveResult(BaseModel):
     status: str = Field(description="Статус сохранения файла")
     message: str = Field(description="Сообщение о результате сохранения в файл")
+
 
 class ReadResult(BaseModel):
     status: str = Field(description="Статус чтения файла")
     message: str = Field(description="Сообщение о результате чтения файла")
     result: str = Field(description="Содержимое файла")
 
+
 class MkdirResult(BaseModel):
     status: str = Field(description="Статус создания директории")
     message: str = Field(description="Сообщение о результате создания директории")
 
+
 class PythonResult(BaseModel):
     status: str = Field(description="Статус запуска Python-кода")
     message: str = Field(description="Сообщение о результате запуска Python-кода.")
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,22 +39,28 @@ _LOGGER = logging.getLogger(__name__)
 #     with open("plan_cool.md", "r") as f:
 #         return f.read()
 
+
 @giga_tool()
 def save_file(
-    file_path: str = Field(description="Путь до файла, в который нужно сохранить содержимое."),
+    file_path: str = Field(
+        description="Путь до файла, в который нужно сохранить содержимое."
+    ),
     content: str = Field(description="Информация, которую нужно сохранить в файл."),
 ) -> SaveResult:
     """Use this tool to save the result to a file."""
     print(f"! save_file to {file_path}, content: {content}")
     try:
-        match_python = re.search(r'```python\s*(.*?)\s*```', content, re.DOTALL)
+        match_python = re.search(r"```python\s*(.*?)\s*```", content, re.DOTALL)
         if match_python:
             content = match_python.group(1)
         with open(file_path, "w") as f:
             f.write(content)
         return SaveResult(status="OK", message="Файл успешно сохранен!")
     except Exception as e:
-        return SaveResult(status="FAIL", message=f"Не удалось сохранить файл, ошибка: {e}")
+        return SaveResult(
+            status="FAIL", message=f"Не удалось сохранить файл, ошибка: {e}"
+        )
+
 
 @giga_tool()
 def read_file(
@@ -62,17 +72,19 @@ def read_file(
         with open(file_path, "r") as f:
             content = f.read()
         if file_path.endswith(".py"):
-            content = (
-                "```python\n"
-                f"{content}"
-                "\n```")
+            content = f"```python\n{content}\n```"
         return ReadResult(status="OK", message="Файл успешно прочитан!", result=content)
     except Exception as e:
-        return ReadResult(status="FAIL", message=f"Не удалось прочитать файл, ошибка: {e}", result=None)
+        return ReadResult(
+            status="FAIL",
+            message=f"Не удалось прочитать файл, ошибка: {e}",
+            result=None,
+        )
+
 
 @giga_tool()
 def create_dir(
-    path: str = Field(description="Путь до директории, которую нужно создать.")
+    path: str = Field(description="Путь до директории, которую нужно создать."),
 ) -> MkdirResult:
     """Use this tool to create a directory."""
     print(f"! create_dir {path}")
@@ -84,26 +96,32 @@ def create_dir(
     except:
         return MkdirResult(status="FAIL", message="Не удалось создать директорию")
 
+
 @giga_tool()
 def run_python_code(
-    code_str: str = Field(description="Строка с Python-кодом, который нужно запустить.")
+    code_str: str = Field(
+        description="Строка с Python-кодом, который нужно запустить."
+    ),
 ) -> PythonResult:
     """Use this tool to run Python code."""
     print(f"! run_python_code {code_str}")
     try:
-        match_python = re.search(r'```python\s*(.*?)\s*```', code_str, re.DOTALL)
+        match_python = re.search(r"```python\s*(.*?)\s*```", code_str, re.DOTALL)
         if match_python:
             code = match_python.group(1)
             result = exec(code)
         else:
-            return PythonResult(status="FAIL", message="Не удалось выделить информацию из блока ```python[code]```.")
-        return PythonResult(status="OK", message=f"Код успешно запущен! Результат: {result}")
+            return PythonResult(
+                status="FAIL",
+                message="Не удалось выделить информацию из блока ```python[code]```.",
+            )
+        return PythonResult(
+            status="OK", message=f"Код успешно запущен! Результат: {result}"
+        )
     except Exception as e:
-        return PythonResult(status="FAIL", message=f"Не удалось запустить код, ошибка: {e}")
+        return PythonResult(
+            status="FAIL", message=f"Не удалось запустить код, ошибка: {e}"
+        )
 
-tools = [
-    save_file,
-    read_file,
-    create_dir,
-    run_python_code
-]
+
+tools = [save_file, read_file, create_dir, run_python_code]

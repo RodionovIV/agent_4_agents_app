@@ -1,6 +1,7 @@
 from langchain_gigachat.chat_models import GigaChat
 
 import os
+
 base_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = base_dir + "/tmp"
 puppeteer_config = base_dir + "/configs/puppeteer-config.json"
@@ -19,6 +20,8 @@ LOG_FILE = "app.log"
 def __read_doc(path):
     with open(path, mode="r") as f:
         return f.read()
+
+
 DESC_PROMPT_PATH = "prompts/desc_prompt.txt"
 DESC_INSTRUMENTS_PATH = "instructions/desc_instruments.txt"
 
@@ -57,7 +60,7 @@ llm = GigaChat(
     max_tokens=8192,
     temperature=0.3,
     repetition_penalty=1.01,
-    timeout=180
+    timeout=180,
 )
 
 # UI Settings
@@ -80,7 +83,7 @@ HEADER_STATUS = {
     "BA": "📊 Генерация бизнес-требований",
     "SA": "🧠 Генерация системных требований",
     "PL": "🪄 Составить план разработки",
-    "CO": "💻 Сгенерировать код"
+    "CO": "💻 Сгенерировать код",
 }
 
 BUTTON_STATUS = {
@@ -100,7 +103,7 @@ RESPONSE_STATUS = {
     "BA": "Бизнес-требования сгенерированы",
     "SA": "Системные требования сгенерированы",
     "PL": "План разработки составлен",
-    "CO": "Код сгенерирован и запушен в https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}"
+    "CO": "Код сгенерирован и запушен в https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}",
 }
 
 NEXT_TASK = {
@@ -108,7 +111,7 @@ NEXT_TASK = {
     "BA": "Переходим на этап генерации бизнес-требований",
     "SA": "Переходим на этап генерации системных требований",
     "PL": "Переходим на этап генерации плана разработки",
-    "CO": "Переходим на этап генерации кода"
+    "CO": "Переходим на этап генерации кода",
 }
 
 REQUIRED_MSGS = {

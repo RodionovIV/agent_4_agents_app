@@ -1,26 +1,23 @@
 from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel
 import sys
 
 import subprocess
 import logging
-import os
 
 _LOGGER = logging.getLogger(__name__)
 
 mcp = FastMCP("Git")
+
 
 @mcp.tool()
 def git_status(repo_path):
     """Use this tool for call git status command for repo_path"""
     _LOGGER.info(f"Call git_status for {repo_path}")
     result = subprocess.run(
-        ['git', 'status'],
-        cwd=repo_path,
-        capture_output=True,
-        text=True
+        ["git", "status"], cwd=repo_path, capture_output=True, text=True
     )
     return result
+
 
 @mcp.tool()
 def git_add(repo_path, file):
@@ -29,12 +26,10 @@ def git_add(repo_path, file):
     """
     _LOGGER.info(f"Call git_add for {repo_path}")
     result = subprocess.run(
-        ['git', 'add', file],
-        cwd=repo_path,
-        capture_output=True,
-        text=True
+        ["git", "add", file], cwd=repo_path, capture_output=True, text=True
     )
     return result
+
 
 @mcp.tool()
 def git_commit(repo_path, msg):
@@ -44,12 +39,10 @@ def git_commit(repo_path, msg):
     """
     _LOGGER.info(f"Call git_commit for {repo_path}")
     result = subprocess.run(
-        ['git', 'commit', "-m", msg],
-        cwd=repo_path,
-        capture_output=True,
-        text=True
+        ["git", "commit", "-m", msg], cwd=repo_path, capture_output=True, text=True
     )
     return result
+
 
 @mcp.tool()
 def git_branch(repo_path):
@@ -58,12 +51,10 @@ def git_branch(repo_path):
     """
     _LOGGER.info(f"Call git_branch for {repo_path}")
     result = subprocess.run(
-        ['git', 'branch'],
-        cwd=repo_path,
-        capture_output=True,
-        text=True
+        ["git", "branch"], cwd=repo_path, capture_output=True, text=True
     )
     return result
+
 
 @mcp.tool()
 def git_push(repo_path):
@@ -72,12 +63,10 @@ def git_push(repo_path):
     """
     _LOGGER.info(f"Call git_push for {repo_path}")
     result = subprocess.run(
-        ['git', 'push'],
-        cwd=repo_path,
-        capture_output=True,
-        text=True
+        ["git", "push"], cwd=repo_path, capture_output=True, text=True
     )
     return result
+
 
 @mcp.tool()
 def git_remote_add(repo_path, remote_url, branch_name):
@@ -90,22 +79,21 @@ def git_remote_add(repo_path, remote_url, branch_name):
         ["git", "remote", "add", "origin", remote_url],
         cwd=repo_path,
         capture_output=True,
-        text=True
+        text=True,
     )
     result = subprocess.run(
         ["git", "branch", "-M", branch_name],
         cwd=repo_path,
         capture_output=True,
-        text=True
+        text=True,
     )
     result = subprocess.run(
         ["git", "push", "-u", "origin", branch_name],
         cwd=repo_path,
         capture_output=True,
-        text=True
+        text=True,
     )
     return result
-
 
 
 if __name__ == "__main__":

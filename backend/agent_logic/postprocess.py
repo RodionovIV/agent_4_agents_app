@@ -2,19 +2,30 @@ import settings
 
 import subprocess
 
+
 def save_content(content, filename):
     with open(filename, "w") as f:
         f.write(content)
 
+
 def render_mermaid(_input, _output):
-    subprocess.run([
-        "mmdc",
-        "-i", _input,
-        "-o", _output,
-        "-t", "dark", # или 'dark', 'forest', 'neutral'
-        "-b", "black",
-        "--puppeteerConfigFile", settings.puppeteer_config
-    ], check=True)
+    subprocess.run(
+        [
+            "mmdc",
+            "-i",
+            _input,
+            "-o",
+            _output,
+            "-t",
+            "dark",  # или 'dark', 'forest', 'neutral'
+            "-b",
+            "black",
+            "--puppeteerConfigFile",
+            settings.puppeteer_config,
+        ],
+        check=True,
+    )
+
 
 def postprocess_response(state, response):
     curent_status = state["status"]

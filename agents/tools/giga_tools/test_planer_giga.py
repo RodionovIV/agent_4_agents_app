@@ -1,17 +1,16 @@
-import os, sys
-from pydantic import BaseModel, Field
+from pydantic import Field
 from langchain_gigachat.tools.giga_tool import giga_tool
 
 
-from pathlib import Path
-import re
 import logging
 
 _LOGGER = logging.getLogger(__name__)
 
 
 @giga_tool()
-def read_instruction(filename:str = Field(description="The path to the readable file.")):
+def read_instruction(
+    filename: str = Field(description="The path to the readable file."),
+):
     """
     Use this tool for read instruction and make decisions.
     Choose correct instruction from list and read it.
@@ -26,6 +25,7 @@ def read_instruction(filename:str = Field(description="The path to the readable 
     with open(filename, "r") as f:
         return f.read()
 
+
 # @mcp.tool()
 # def write_plan(plan):
 #     """
@@ -39,6 +39,4 @@ def read_instruction(filename:str = Field(description="The path to the readable 
 #     with open("plan_cool.md", "w") as f:
 #         return f.write(plan)
 
-tools = [
-    read_instruction
-]
+tools = [read_instruction]

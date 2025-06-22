@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 RUN apt-get update && apt-get install -y \
       curl \
@@ -32,11 +32,12 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
+
+RUN pip install uv && uv sync
 
 RUN git config --global --add safe.directory /app/sandbox
 RUN git config --global user.email "mr.ts777@yandex.ru"
 RUN git config --global user.name "RodionovIV"
 
-CMD ["python", "app.py"]
+CMD ["uv", "run", "app.py"]
