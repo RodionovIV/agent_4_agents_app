@@ -1,0 +1,10 @@
+from typing import TypedDict, List
+
+class AgentState(TypedDict):
+    messages: List
+    result: str
+    previous: str
+    {%- for agent in agents %}
+    {{ agent }}_task: str
+    {{ agent }}_result: str
+    {%- endfor %}

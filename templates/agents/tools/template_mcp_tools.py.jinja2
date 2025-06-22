@@ -1,0 +1,50 @@
+{% macro f_template(function_name, docstring, args, body) %}
+@mcp.tool()
+def {{ function_name }}({{ args|default("") }}):
+    """{{ docstring }}"""
+    {{ body | indent(4) }}
+{% endmacro %}
+
+
+{% macro g_template(function_name, docstring, args, body) %}
+@mcp.tool()
+def {{ function_name }}({{ args|default("") }}):
+    """{{ docstring }}"""
+    # Дополнительная логика для G
+    print("Вызвана g-функция")
+    {{ body | indent(4) }}
+{% endmacro %}
+
+{% macro get_mcp_template(function_name, description, args) %}
+@mcp.tool()
+def {{ function_name }}({{ args|default("") }}):
+    """{{ description }}"""
+    try:
+        url = os.getenv("{{ function_name|upper }}")
+        response = requests.get(url)
+        print(f"Вызван get-tool для url {url}")
+        response.raise_for_status()
+        return response.text
+    except requests.exceptions.RequestException as e:
+        e_str = f"Ошибка при отправлении запроса: {e}"
+        print(e_str)
+        return e_str
+{% endmacro %}
+
+{% macro post_mcp_template(function_name, description, args) %}
+@mcp.tool()
+def {{ function_name }}({{ args|default("data") }}):
+    """{{ description }}"""
+    try:
+        url = os.getenv("{{ function_name|upper }}")
+        headers = {"Content-Type": "application/json"}
+        data = json.dumps(data)
+        response = requests.post(url, data, headers=headers)
+        print(f"Вызван post-tool для url {url}")
+        response.raise_for_status()
+        return response.text
+    except requests.exceptions.RequestException as e:
+        e_str = f"Ошибка при отправлении запроса: {e}"
+        print(e_str)
+        return e_str
+{% endmacro %}

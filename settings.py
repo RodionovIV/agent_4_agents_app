@@ -1,11 +1,14 @@
-from langchain_gigachat.chat_models import GigaChat
-
+import json
 import os
+
+from langchain_gigachat.chat_models import GigaChat
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = base_dir + "/tmp"
 puppeteer_config = base_dir + "/configs/puppeteer-config.json"
+code_config = base_dir + "/configs/code-template-config.json"
 tools_dir = base_dir + "/agents/tools/mcp_tools/"
+templates_dir = base_dir + "/templates"
 
 # MCP Tools
 planer_mcp_tool = tools_dir + "test_planer_mcp.py"
@@ -22,6 +25,14 @@ def __read_doc(path):
         return f.read()
 
 
+def __read_json(path):
+    with open(path, mode="r") as f:
+        return json.load(f)
+
+
+CODE_TEMPLATES = {
+    k: os.path.join(templates_dir, v) for k, v in __read_json(code_config).items()
+}
 DESC_PROMPT_PATH = "prompts/desc_prompt.txt"
 DESC_INSTRUMENTS_PATH = "instructions/desc_instruments.txt"
 

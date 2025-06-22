@@ -1,0 +1,15 @@
+import settings
+
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+client = MultiServerMCPClient(
+    {
+        {%- for tool_name, tool_path in tools.items() %}
+        "{{ tool_name }}": {
+            "transport": "stdio",
+            "command": "python",
+            "args": [settings.{{ tool_path }}]
+        }{% if not loop.last %},{% endif %}
+        {%- endfor %}
+    }
+)

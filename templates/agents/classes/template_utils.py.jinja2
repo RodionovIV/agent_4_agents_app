@@ -1,0 +1,15 @@
+import re
+from typing import List
+
+
+def parse_question(text: str) -> List[str]:
+    """
+    Извлекает все блоки JSON, заключённые в ```json ... ``` из текста.
+    Возвращает список строк (каждая — отдельный блок JSON).
+    """
+    pattern = r"```json\s*(.*?)\s*```"
+    matches = re.search(pattern, text, re.DOTALL)
+    result = None
+    if matches:
+        result = eval(matches.group(1))
+    return result

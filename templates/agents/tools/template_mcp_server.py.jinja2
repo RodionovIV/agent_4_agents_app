@@ -1,0 +1,14 @@
+import json
+import os
+import sys
+
+import requests
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("{{ server_name }}", port={{ port|default(8000) }})
+
+{{ tools_code }}
+
+if __name__ == "__main__":
+    transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
+    mcp.run(transport=transport)

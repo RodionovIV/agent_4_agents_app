@@ -1,0 +1,16 @@
+{
+  "TEMPLATE_AGENT_STATE": "agents/classes/template_agent_state.py.jinja2",
+  "TEMPLATE_AGENT_CLASS": "agents/classes/template_agent_with_memory.py.jinja2",
+  "TEMPLATE_GRAPH_NODE": "agents/classes/template_node.py.jinja2",
+  "TEMPLATE_GRAPH_STRUCTURE": "agents/classes/template_graph.py.jinja2",
+  "TEMPLATE_MCP_CLIENT": "agents/tools/template_mcp_client.py.jinja2",
+  "TEMPLATE_MCP_SERVER": "agents/tools/template_mcp_server.py.jinja2",
+  "TEMPLATE_MCP_TOOLS": "agents/tools/template_mcp_tools.py.jinja2",
+  "TEMPLATE_ENDPOINTS": "app/template_endpoints.py.jinja2",
+  "TEMPLATE_MAIN": "app/template_main.py.txt",
+  "TEMPLATE_MODELS_AGENT": "app/template_models_agent.py.txt",
+  "TEMPLATE_SETTINGS": "app/template_settings.py.jinja2",
+  "TEMPLATE_README": "app/template_readme.md.jinja2",
+  "TEMPLATE_REQUIREMENTS": "app/template_requirements.txt",
+  "TEMPLATE_DOCKER": "app/template_docker.txt"
+}
