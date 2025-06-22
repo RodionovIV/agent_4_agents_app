@@ -1,15 +1,16 @@
-from abstract.abstract_agent import AbstractAgent
-from settings import llm, ba_prompt, ba_instruction
-from utils.cutomLogger import customLogger
-from langchain.schema import HumanMessage
-from langgraph.prebuilt import create_react_agent
-from langgraph.checkpoint.memory import MemorySaver
-from typing import TypedDict, List
-from typing_extensions import TypedDict
-from agents.utils.parser import Parser
-from agents.utils.text_formatter import TextFormatter
-from agents.utils.result_formatter import ResultFormatter
+from typing import List
 
+from langchain.schema import HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.prebuilt import create_react_agent
+from typing_extensions import TypedDict
+
+from abstract.abstract_agent import AbstractAgent
+from agents.utils.parser import Parser
+from agents.utils.result_formatter import ResultFormatter
+from agents.utils.text_formatter import TextFormatter
+from settings import ba_instruction, ba_prompt, llm
+from utils.cutomLogger import customLogger
 
 _LOGGER = customLogger.getLogger(__name__)
 POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй бизнес-требования заново."

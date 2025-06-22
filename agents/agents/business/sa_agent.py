@@ -1,17 +1,16 @@
-from settings import llm, sa_prompt, sa_instruction
-from utils.cutomLogger import customLogger
+from typing import List, TypedDict
 
 from langchain.schema import HumanMessage
-from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
-from typing import TypedDict, List
+from langgraph.prebuilt import create_react_agent
 from typing_extensions import TypedDict
 
 from abstract.abstract_agent import AbstractAgent
 from agents.utils.parser import Parser
-from agents.utils.text_formatter import TextFormatter
 from agents.utils.result_formatter import ResultFormatter
-
+from agents.utils.text_formatter import TextFormatter
+from settings import llm, sa_instruction, sa_prompt
+from utils.cutomLogger import customLogger
 
 _LOGGER = customLogger.getLogger(__name__)
 POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй системную аналитику заново."
