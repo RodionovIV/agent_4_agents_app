@@ -13,6 +13,7 @@ from abstract.abstract_agent import AbstractAgent
 from agents.utils.text_formatter import TextFormatter
 from agents.utils.result_formatter import ResultFormatter
 
+
 _LOGGER = customLogger.getLogger(__name__)
 POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй план разработки полностью заново."
 
@@ -64,14 +65,6 @@ class PlAgent(AbstractAgent):
             HumanMessage(content=result, name="Аналитик")
         ]
         return state
-
-    def get_result(self, state: PlAgentState):
-        if "result" in state and state["result"]:
-            return {"status": "OK", "content": state["result"]}
-        elif "questions" in state and state["questions"]:
-            return {"status": "QUES", "content": state["questions"]}
-        else:
-            return {"status": "FAIL", "content": "Возникла ошибка"}
 
     async def run(self, msg: str, state: PlAgentState, config: dict):
         if "messages" not in state or not state["messages"]:
