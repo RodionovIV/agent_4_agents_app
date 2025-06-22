@@ -1,10 +1,13 @@
 import json
+from pathlib import Path
 
 
 class FileProcessor:
     @staticmethod
     def save_str(filename, content):
-        with open(filename, mode="w") as f:
+        file_path = Path(filename)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open(mode="w") as f:
             f.write(content)
 
     @staticmethod

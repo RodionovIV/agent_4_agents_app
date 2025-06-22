@@ -15,9 +15,10 @@ env = Environment(loader=FileSystemLoader(templates_dir))
 
 
 class Generator:
-    def __init__(self, project_name):
+    def __init__(self, project_name, agent_config):
         self.project = project_name
         self.config = deepcopy(CODE_TEMPLATES)
+        self.agent_config = agent_config
 
     def get_template(self, template_name):
         return env.get_template(self.config[template_name]["template"])
@@ -25,9 +26,18 @@ class Generator:
     def get_template_txt(self, template_name):
         return FileProcessor.read_file(self.config[template_name]["template"])
 
+    def get_path(self, template_name, kwargs=None):
+        if not kwargs:
+            kwargs = dict()
+        kwargs["project"] = self.project
+        return self.config[template_name]["path"].format(**kwargs)
+
     def generate_mcp_server(
         self, functions: List[Dict[str, str]], server_name: str, output_file: str
     ) -> None:
+        output_file = self.get_path(
+            "TEMPLATE_MCP_SERVER", kwargs={"server_name": server_name}
+        )
         template_tools = self.get_template("TEMPLATE_MCP_TOOLS")
         template_server = self.get_template("TEMPLATE_MCP_SERVER")
 
@@ -58,27 +68,37 @@ class Generator:
         _LOGGER.info(f"MCP Server успешно записан в {output_file}")
 
     def generate_mcp_client(self, tools: Dict[str, str], output_file: str) -> None:
-        template_server = self.get_template("TEMPLATE_MCP_CLIENT")
+        template_name = "TEMPLATE_MCP_CLIENT"
+        output_file = self.get_path(template_name)
+        template_server = self.get_template(template_name)
         config_str = template_server.render(tools=tools)
         FileProcessor.save_str(output_file, config_str)
         _LOGGER.info(f"MCP Client записан в файл {output_file}")
 
     def generate_agent_state(self, agents: List[str], output_file: str) -> None:
-        template_state = self.get_template("TEMPLATE_AGENT_STATE")
+        template_name = "TEMPLATE_AGENT_STATE"
+        output_file = self.get_path(template_name)
+        template_state = self.get_template(template_name)
         state_str = template_state.render(agents=agents)
         FileProcessor.save_str(output_file, state_str)
         _LOGGER.info(f"Agent State записан в файл {output_file}")
 
     def generate_agent(
-        self, agent: str, server_names: List[str], output_file: str
+        self, agent_name: str, server_names: List[str], output_file: str
     ) -> None:
-        template_state = self.get_template("TEMPLATE_AGENT_CLASS")
-        state_str = template_state.render(agent_name=agent, server_names=server_names)
+        template_name = "TEMPLATE_AGENT_CLASS"
+        output_file = self.get_path(template_name, kwargs={"agent_name": agent_name})
+        template_state = self.get_template(template_name)
+        state_str = template_state.render(
+            agent_name=agent_name, server_names=server_names
+        )
         FileProcessor.save_str(output_file, state_str)
         _LOGGER.info(f"Agent Class записан в файл {output_file}")
 
     def generate_endpoints(self, agent: str, output_file: str) -> None:
-        template = self.get_template("TEMPLATE_ENDPOINTS")
+        template_name = "TEMPLATE_ENDPOINTS"
+        output_file = self.get_path(template_name)
+        template = self.get_template(template_name)
         endpoints_code = template.render(agent_name=agent)
         FileProcessor.save_str(output_file, endpoints_code)
         _LOGGER.info(f"Agent Endpoints записан в файл {output_file}")
@@ -86,7 +106,9 @@ class Generator:
     def generate_settings(
         self, agents: List[str], servers: List[str], output_file: str
     ) -> None:
-        template = self.get_template("TEMPLATE_SETTINGS")
+        template_name = "TEMPLATE_SETTINGS"
+        output_file = self.get_path(template_name)
+        template = self.get_template(template_name)
         settings_code = template.render(agents=agents, servers=servers)
         FileProcessor.save_str(output_file, settings_code)
         _LOGGER.info(f"Settings записан в файл {output_file}")
@@ -95,23 +117,25 @@ class Generator:
         self,
         project_path: str,
         output_file: str,
-        project_name: str = None,
-        project_desc: str = None,
     ) -> None:
-        readme_template = self.get_template("TEMPLATE_README")
+        template_name = "TEMPLATE_README"
+        output_file = self.get_path(template_name)
+        readme_template = self.get_template(template_name)
         result = subprocess.run(["tree", project_path], capture_output=True, text=True)
         tree = result.stdout
         base_path = os.path.basename(project_path)
         tree = tree.replace(project_path, base_path)
-        test_desc = "Тестовое описание"
+        desc = self.agent_config.get("project_desc", "")
+        project_name = self.agent_config.get("project_name", "")
         readme_txt = readme_template.render(
-            project_name="TEST_PROJECT", description=test_desc, tree=tree
+            project_name=project_name, description=desc, tree=tree
         )
         FileProcessor.save_str(output_file, readme_txt)
         _LOGGER.info(f"README сгенерирован и сохранен в {output_file}")
 
-    @staticmethod
-    def generate_env(functions: List, output_file: str) -> None:
+    def generate_env(self, functions: List, output_file: str) -> None:
+        template_name = "TEMPLATE_ENV"
+        output_file = self.get_path(template_name)
         valid_types = {"get_mcp_template", "post_mcp_template"}
         _functions = []
         for function in functions:
@@ -127,6 +151,8 @@ class Generator:
         return ", ".join(params)
 
     def generate_graph(self, graph: Dict, output_file: str) -> None:
+        output_file = self.get_path("TEMPLATE_GRAPH_STRUCTURE")
+        template_graph = self.get_template("TEMPLATE_GRAPH_STRUCTURE")
         template_node = self.get_template("TEMPLATE_GRAPH_NODE")
         macro_module = template_node.make_module()
         agent_node_templates = {
@@ -134,7 +160,6 @@ class Generator:
             "agent_orchestrator": macro_module.agent_orchestrator,
         }
 
-        template_graph = self.get_template("TEMPLATE_GRAPH_STRUCTURE")
         initial_state = graph.get("initialState", "")
         agents, directions = [], []
         nodes_code_list = []

@@ -9,7 +9,7 @@
   },
   "TEMPLATE_GRAPH_NODE": {
     "template": "agents/classes/template_node.py.jinja2",
-    "path": null
+    "path": "null"
   },
   "TEMPLATE_GRAPH_STRUCTURE": {
     "template": "agents/classes/template_graph.py.jinja2",
@@ -25,7 +25,7 @@
   },
   "TEMPLATE_MCP_TOOLS": {
     "template": "agents/tools/template_mcp_tools.py.jinja2",
-    "path": null
+    "path": "null"
   },
   "TEMPLATE_ENDPOINTS": {
     "template": "app/template_endpoints.py.jinja2",
@@ -54,5 +54,9 @@
   "TEMPLATE_DOCKER": {
     "template": "app/template_docker.txt",
     "path": "{project}/Dockerfile"
+  },
+  "TEMPLATE_ENV": {
+    "template": "null",
+    "path": "{project}/.env"
   }
 }
