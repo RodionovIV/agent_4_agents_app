@@ -1,16 +1,58 @@
 {
-  "TEMPLATE_AGENT_STATE": "agents/classes/template_agent_state.py.jinja2",
-  "TEMPLATE_AGENT_CLASS": "agents/classes/template_agent_with_memory.py.jinja2",
-  "TEMPLATE_GRAPH_NODE": "agents/classes/template_node.py.jinja2",
-  "TEMPLATE_GRAPH_STRUCTURE": "agents/classes/template_graph.py.jinja2",
-  "TEMPLATE_MCP_CLIENT": "agents/tools/template_mcp_client.py.jinja2",
-  "TEMPLATE_MCP_SERVER": "agents/tools/template_mcp_server.py.jinja2",
-  "TEMPLATE_MCP_TOOLS": "agents/tools/template_mcp_tools.py.jinja2",
-  "TEMPLATE_ENDPOINTS": "app/template_endpoints.py.jinja2",
-  "TEMPLATE_MAIN": "app/template_main.py.txt",
-  "TEMPLATE_MODELS_AGENT": "app/template_models_agent.py.txt",
-  "TEMPLATE_SETTINGS": "app/template_settings.py.jinja2",
-  "TEMPLATE_README": "app/template_readme.md.jinja2",
-  "TEMPLATE_REQUIREMENTS": "app/template_requirements.txt",
-  "TEMPLATE_DOCKER": "app/template_docker.txt"
+  "TEMPLATE_AGENT_STATE": {
+    "template": "agents/classes/template_agent_state.py.jinja2",
+    "path": "{project}/services/agents/agent_state.py"
+  },
+  "TEMPLATE_AGENT_CLASS": {
+    "template": "agents/classes/template_agent_with_memory.py.jinja2",
+    "path": "{project}/services/agents/{agent_name}_agent.py"
+  },
+  "TEMPLATE_GRAPH_NODE": {
+    "template": "agents/classes/template_node.py.jinja2",
+    "path": null
+  },
+  "TEMPLATE_GRAPH_STRUCTURE": {
+    "template": "agents/classes/template_graph.py.jinja2",
+    "path": "{project}/services/agents/graph.py"
+  },
+  "TEMPLATE_MCP_CLIENT": {
+    "template": "agents/tools/template_mcp_client.py.jinja2",
+    "path": "{project}/services/mcp/mcp_client.py"
+  },
+  "TEMPLATE_MCP_SERVER": {
+    "template": "agents/tools/template_mcp_server.py.jinja2",
+    "path": "{project}/services/mcp/{server_name}_mcp.py"
+  },
+  "TEMPLATE_MCP_TOOLS": {
+    "template": "agents/tools/template_mcp_tools.py.jinja2",
+    "path": null
+  },
+  "TEMPLATE_ENDPOINTS": {
+    "template": "app/template_endpoints.py.jinja2",
+    "path": "{project}/api/endpoints.py"
+  },
+  "TEMPLATE_MAIN": {
+    "template": "app/template_main.py.txt",
+    "path": "{project}/main.py"
+  },
+  "TEMPLATE_MODELS_AGENT": {
+    "template": "app/template_models_agent.py.txt",
+    "path": "{project}/models/agents.py"
+  },
+  "TEMPLATE_SETTINGS": {
+    "template": "app/template_settings.py.jinja2",
+    "path": "{project}/settings.py"
+  },
+  "TEMPLATE_README": {
+    "template": "app/template_readme.md.jinja2",
+    "path": "{project}/README.md"
+  },
+  "TEMPLATE_REQUIREMENTS": {
+    "template": "app/template_requirements.txt",
+    "path": "{project}/requirements.txt"
+  },
+  "TEMPLATE_DOCKER": {
+    "template": "app/template_docker.txt",
+    "path": "{project}/Dockerfile"
+  }
 }

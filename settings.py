@@ -31,7 +31,13 @@ def __read_json(path):
 
 
 CODE_TEMPLATES = {
-    k: os.path.join(templates_dir, v) for k, v in __read_json(code_config).items()
+    k: {
+        "template": v["template"]
+        if v["template"].endswith(".jinja2")
+        else os.path.join(templates_dir, v["template"]),
+        "path": v["path"],
+    }
+    for k, v in __read_json(code_config).items()
 }
 DESC_PROMPT_PATH = "prompts/desc_prompt.txt"
 DESC_INSTRUMENTS_PATH = "instructions/desc_instruments.txt"
