@@ -1,4 +1,5 @@
-from typing import TypedDict, Dict
+from typing import Dict, TypedDict
+
 from agents.utils.parser import Parser
 
 
