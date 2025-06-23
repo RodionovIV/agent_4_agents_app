@@ -79,7 +79,7 @@ config_prompt = __read_doc(CONFIG_PROMPT_PATH)
 pl_prompt = __read_doc(PL_PROMPT_PATH)
 coder_prompt = __read_doc(CODER_PROMPT_PATH)
 git_prompt = __read_doc(GIT_PROMPT_PATH)
-git_repo = "/media/ts777/Kingston/Sandbox/agent-sandbox"  # "/app/sandbox"
+git_repo = "/app/sandbox"
 
 llm = GigaChat(
     model="GigaChat-2-Max",
