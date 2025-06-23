@@ -1,14 +1,13 @@
+import gradio as gr
+
 import settings
-from backend.agent_logic.init import create_agents, create_filename, make_config
-from backend.agent_logic.in_progress import (
-    update_progress_html,
-    router,
-    wrapp_header,
-    check_state,
-)
+from backend.agent_logic.in_progress import (check_state, router,
+                                             update_progress_html,
+                                             wrapp_header)
+from backend.agent_logic.init import (create_agents, create_filename,
+                                      make_config)
 from backend.agent_logic.postprocess import postprocess_response
 from utils.cutomLogger import customLogger
-import gradio as gr
 
 _LOGGER = customLogger.getLogger(__name__)
 AGENTS = create_agents()
@@ -54,7 +53,10 @@ async def action_push_submit_button(user_input, state):
         if curent_status == "CO" and (
             "task" not in current_state or not current_state["task"]
         ):
-            ai_message = {"role": "assistant", "content": "Введите план разработки"}
+            ai_message = {
+                "role": "assistant",
+                "content": "Введите описание с графом связей между агентами",
+            }
             state["messages"].append(ai_message)
         else:
             print(state)

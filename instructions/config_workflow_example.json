@@ -1,0 +1,56 @@
+{
+  "projectName": "Название проекта",
+  "projectDesc": "Описание проекта",
+  "systemType": "workflow",
+  "graph": {
+    "initialState": "agent_1",
+    "nodes": [
+      {
+        "name": "agent_1",
+        "to": "agent_2"
+      },
+      {
+        "name": "agent_2",
+        "to": "END"
+      }
+    ]
+  },
+  "agents": [
+    {
+      "agentName": "agent_1",
+      "agentDescription": "Агент для получения запросов",
+      "agentType": "agent_with_tools",
+      "servers": [
+        "mcp_server_1"
+      ]
+    },
+    {
+      "agentName": "agent_2",
+      "agentDescription": "Агент для отправки запросов",
+      "agentType": "agent_with_tools",
+      "servers": [
+        "mcp_server_1"
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "serverName": "mcp_server_1",
+      "tools": [
+        {
+          "toolName": "test_get",
+          "toolType": "get_mcp_template",
+          "toolDescription": "TEST GET MCP TOOL"
+        },
+        {
+          "toolName": "test_post",
+          "toolType": "post_mcp_template",
+          "toolDescription": "TEST POST MCP TOOL",
+          "params": [
+            "data"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,13 +1,17 @@
-from langchain_gigachat.chat_models import GigaChat
-
+import json
 import os
+
+from langchain_gigachat.chat_models import GigaChat
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = base_dir + "/tmp"
 puppeteer_config = base_dir + "/configs/puppeteer-config.json"
+code_config = base_dir + "/configs/code-template-config.json"
 tools_dir = base_dir + "/agents/tools/mcp_tools/"
+templates_dir = base_dir + "/templates"
 
 # MCP Tools
+config_mcp_tool = tools_dir + "config_validator_mcp_tool.py"
 planer_mcp_tool = tools_dir + "test_planer_mcp.py"
 coder_mcp_tool = tools_dir + "test_coder_mcp.py"
 git_mcp_tool = tools_dir + "test_git_mcp.py"
@@ -22,6 +26,20 @@ def __read_doc(path):
         return f.read()
 
 
+def __read_json(path):
+    with open(path, mode="r") as f:
+        return json.load(f)
+
+
+CODE_TEMPLATES = {
+    k: {
+        "template": v["template"]
+        if v["template"].endswith(".jinja2")
+        else os.path.join(templates_dir, v["template"]),
+        "path": v["path"],
+    }
+    for k, v in __read_json(code_config).items()
+}
 DESC_PROMPT_PATH = "prompts/desc_prompt.txt"
 DESC_INSTRUMENTS_PATH = "instructions/desc_instruments.txt"
 
@@ -32,6 +50,11 @@ BA_PROMPT_PATH = "prompts/ba_prompt.txt"
 
 SA_INSTRUCTION_PATH = "instructions/sa_instruction.md"
 SA_PROMPT_PATH = "prompts/sa_prompt.txt"
+
+CONFIG_SPECIFICATION_PATH = "instructions/config_specification.json"
+CONFIG_EXAMPLE_WORKFLOW_PATH = "instructions/config_workflow_example.json"
+CONFIG_EXAMPLE_ORCHESTRATOR_PATH = "instructions/config_orchestrator_example.json"
+CONFIG_PROMPT_PATH = "prompts/config_generator_prompt.txt"
 
 PL_PROMPT_PATH = "prompts/planer_prompt.txt"
 CODER_PROMPT_PATH = "prompts/coder_prompt.txt"
@@ -48,9 +71,15 @@ ba_prompt = __read_doc(BA_PROMPT_PATH)
 sa_instruction = __read_doc(SA_INSTRUCTION_PATH)
 sa_prompt = __read_doc(SA_PROMPT_PATH)
 
+config_specification = __read_json(CONFIG_SPECIFICATION_PATH)
+config_example_orchestrator = __read_json(CONFIG_EXAMPLE_ORCHESTRATOR_PATH)
+config_example_workflow = __read_json(CONFIG_EXAMPLE_WORKFLOW_PATH)
+config_prompt = __read_doc(CONFIG_PROMPT_PATH)
+
 pl_prompt = __read_doc(PL_PROMPT_PATH)
 coder_prompt = __read_doc(CODER_PROMPT_PATH)
 git_prompt = __read_doc(GIT_PROMPT_PATH)
+git_repo = "/app/sandbox"
 
 llm = GigaChat(
     model="GigaChat-2-Max",
@@ -103,7 +132,7 @@ RESPONSE_STATUS = {
     "BA": "Бизнес-требования сгенерированы",
     "SA": "Системные требования сгенерированы",
     "PL": "План разработки составлен",
-    "CO": "Код сгенерирован и запушен в https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}",
+    "CO": "Статус: {response}\n\nРепозиторий: \nhttps://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}",
 }
 
 NEXT_TASK = {

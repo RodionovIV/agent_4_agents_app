@@ -1,6 +1,6 @@
-import settings
-
 from langchain_mcp_adapters.client import MultiServerMCPClient
+
+import settings
 
 client = MultiServerMCPClient(
     {
@@ -18,6 +18,11 @@ client = MultiServerMCPClient(
             "transport": "stdio",
             "command": "python",
             "args": [settings.git_mcp_tool],
+        },
+        "config": {
+            "transport": "stdio",
+            "command": "python",
+            "args": [settings.config_mcp_tool],
         },
     },
 )

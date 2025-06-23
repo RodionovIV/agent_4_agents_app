@@ -1,0 +1,24 @@
+import inspect
+from typing import Literal
+
+from langgraph.graph import StateGraph, END
+from langgraph.types import Command
+
+from services.agents.agent_state import AgentState
+{%- for agent_name in agents %}
+from services.agents.{{ agent_name }}_agents import {{ agent_name|title|replace(" ", "") }}Agent
+{%- endfor %}
+
+{{ nodes_code }}
+
+async def create_graph():
+    {%- for agent_name in agents %}
+    _{{ agent_name }}_agent = await {{ agent_name|title|replace(" ", "") }}Agent.create()
+    {%- endfor %}
+    builder = StateGraph(state_schema=AgentState)
+    builder.set_entry_point("{{ initial_state }}")
+    {%- for agent_name in agents %}
+    builder.add_node("{{ agent_name }}", {{ agent_name }}_node(_{{ agent_name }}_agent))
+    {%- endfor %}
+    graph = builder.compile()
+    return graph

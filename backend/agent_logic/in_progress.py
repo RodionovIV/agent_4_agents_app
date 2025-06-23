@@ -33,9 +33,9 @@ def save_graph_state(state):
     next_status = "BA"
     generate = False
     if state["gen_precondition"]:
-        state["agent_states"][next_status]["task"] = state["agent_states"][cur_status][
-            "description"
-        ]
+        desc = state["agent_states"][cur_status]["description"]
+        state["agent_states"][next_status]["task"] = desc
+        state["agent_states"]["CO"]["task"] = desc
         generate = True
     state["gen_precondition"] = generate
     return state
@@ -70,7 +70,7 @@ def save_pl_state(state):
     next_status = "CO"
     generate = False
     if state["gen_precondition"]:
-        state["agent_states"][next_status]["task"] = state["results"]["PL"]
+        # state["agent_states"][next_status]["task"] = state["results"]["PL"]
         generate = True
     state["gen_precondition"] = generate
     return state

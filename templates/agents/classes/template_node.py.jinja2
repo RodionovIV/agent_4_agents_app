@@ -1,0 +1,80 @@
+{% macro agent_with_tools(agent_name, direction) %}
+def {{ agent_name }}_node(agent):
+    async def create_node(state:AgentState)->Command[Literal[{{ '"' + direction + '"' if direction != 'END' else direction }}]]:
+        node_name = "{{ agent_name }}_node"
+        task_field = "{{ agent_name }}_task"
+        result_field = "{{ agent_name }}_result"
+        state["previous"] = "{{ agent_name }}"
+        print(f"Status: {node_name}")
+
+        new_state = await agent.run_agent(state)
+
+        goto = {{ '"' + direction + '"' if direction != 'END' else direction }}
+        if goto == END:
+            new_state["result"] = new_state["result_field"]
+        return Command(
+            update={
+                k:v for k, v in new_state.items()
+            },
+            goto=goto
+        )
+    return create_node
+{% endmacro %}
+
+{% macro agent_orchestrator(agent_name, direction) %}
+{%- set direction_with_end = direction if "END" in direction else direction + [END] -%}
+def {{ agent_name }}_node(agent):
+    async def create_node(state:AgentState)->Command[Literal[{{ direction_with_end | map('tojson') | join(', ') }}]]:
+        node_name = "{{ agent_name }}_node"
+        task_field = "{{ agent_name }}_task"
+        result_field = "{{ agent_name }}_result"
+        state["previous"] = "{{ agent_name }}"
+        print(f"Status: {node_name}")
+        for _ in range(3):
+            new_state = await agent.run_agent(state)
+            tmp_result = parse_question(new_state[result_field])
+            if tmp_result:
+                break
+            else:
+                new_state[result_field] = tmp_result["result"]
+                goto = tmp_result["next"]
+        else:
+            new_state[result_field] = "FAIL"
+            goto = END
+        if goto == END:
+            result = new_state[result_field]
+        return Command(
+            update={
+                k:v for k, v in new_state.items()
+            },
+            goto=goto
+        )
+    return create_node
+{% endmacro %}
+
+{% macro agent_validator(agent_name, direction) %}
+def {{ agent_name }}_node(agent):
+    {%- set direction_with_end = direction if "END" in direction else direction + [END] -%}
+    async def create_node(state:AgentState)->Command[Literal[{{ direction_with_end | map('tojson') | join(', ') }}]]:
+        node_name = "{{ agent_name }}_node"
+        task_field = "{{ agent_name }}_task"
+        result_field = "{{ agent_name }}_result"
+        print(f"Status: {node_name}")
+        for _ in range(3):
+            new_state = await agent.run_agent(state)
+            tmp_result = parse_question(new_state[result_field])
+            if tmp_result:
+                break
+            else:
+                new_state[result_field] = tmp_result["result"]
+                goto = direction if tmp_result["status"] == "SUCCESS" else new_state["previous"]
+        else:
+            goto = direction
+        return Command(
+            update={
+                k:v for k, v in new_state.items()
+            },
+            goto=goto
+        )
+    return create_node
+{% endmacro %}
