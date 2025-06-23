@@ -3,7 +3,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from abstract.abstract_agent import AbstractAgent
-from agents.agents.states.code_state import CoAgentState
+from agents.agents.states import CoAgentState
 from agents.tools.mcp_tools.tools import client
 from agents.utils.text_formatter import TextFormatter
 from settings import llm

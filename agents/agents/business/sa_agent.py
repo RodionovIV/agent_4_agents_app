@@ -1,11 +1,9 @@
-from typing import List, TypedDict
-
 from langchain.schema import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
-from typing_extensions import TypedDict
 
 from abstract.abstract_agent import AbstractAgent
+from agents.agents.states import SaAgentState
 from agents.utils.parser import Parser
 from agents.utils.result_formatter import ResultFormatter
 from agents.utils.text_formatter import TextFormatter
@@ -14,15 +12,6 @@ from utils.cutomLogger import customLogger
 
 _LOGGER = customLogger.getLogger(__name__)
 POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй системную аналитику заново."
-
-
-class SaAgentState(TypedDict):
-    task: str
-    description: str
-    ba_requirements: str
-    messages: List
-    result: str
-    questions: List
 
 
 class SaAgent(AbstractAgent):

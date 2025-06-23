@@ -1,10 +1,9 @@
-from typing import List, TypedDict
-
 from langchain.schema import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from abstract.abstract_agent import AbstractAgent
+from agents.agents.states import PlAgentState
 from agents.tools.mcp_tools.tools import client
 from agents.utils.result_formatter import ResultFormatter
 from agents.utils.text_formatter import TextFormatter
@@ -13,12 +12,6 @@ from utils.cutomLogger import customLogger
 
 _LOGGER = customLogger.getLogger(__name__)
 POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй план разработки полностью заново."
-
-
-class PlAgentState(TypedDict):
-    task: str
-    result: str
-    messages: List
 
 
 class PlAgent(AbstractAgent):
