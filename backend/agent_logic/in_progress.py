@@ -34,8 +34,9 @@ def save_graph_state(state):
     generate = False
     if state["gen_precondition"]:
         desc = state["agent_states"][cur_status]["description"]
+        graph = state["agent_states"][cur_status]["result"]
         state["agent_states"][next_status]["task"] = desc
-        state["agent_states"]["CO"]["task"] = desc
+        state["agent_states"]["CO"]["task"] = graph
         generate = True
     state["gen_precondition"] = generate
     return state

@@ -87,25 +87,26 @@ def check_config(config_file):
     Use this tool to check the generated config for correctness.
     """
     _LOGGER.info(f" ! check_config tool with config {str(config_file)}")
+    result = "CONFIG INVALID. Check format."
     try:
         file = parse_json(config_file)
         spec = SystemSpec(**file)
         result = "CONFIG VALID"
         _LOGGER.info(result)
-        return result
     except ValidationErr as e:
         result = f"Validation failed: {e}"
         _LOGGER.info(result)
-        return result
     except JSONDecodeError as e:
-        result = f"Incorrect JSON: {e}"
+        result = f"Incorrect JSON. Check it."
         _LOGGER.info(result)
-        return result
     except SyntaxError as e:
         result = f"Request failed: config must contain ```json. {e}"
         _LOGGER.info(result)
+    except Exception as e:
+        result = f"Validation failed: {e}"
+        _LOGGER.info(result)
+    finally:
         return result
-
 
 if __name__ == "__main__":
     transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
