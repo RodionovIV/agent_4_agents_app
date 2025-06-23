@@ -1,0 +1,72 @@
+{
+  "projectName": "Название проекта",
+  "projectDesc": "Описание проекта",
+  "systemType": "orchestrator",
+  "graph": {
+    "initialState": "orchestrator",
+    "nodes": [
+      {
+        "name": "orchestrator",
+        "to": "agent_1,agent_2,END"
+      },
+      {
+        "name": "agent_1",
+        "to": "orchestrator"
+      },
+      {
+        "name": "agent_2",
+        "to": "orchestrator"
+      }
+    ]
+  },
+  "agents": [
+    {
+      "agentName": "orchestrator",
+      "agentDescription": "Агент-оркестратор",
+      "agentType": "agent_orchestrator",
+      "servers": [
+      ]
+    },
+    {
+      "agentName": "agent_1",
+      "agentDescription": "Агент для получения запросов",
+      "agentType": "agent_with_tools",
+      "servers": [
+        "mcp_server_1"
+      ]
+    },
+    {
+      "agentName": "agent_2",
+      "agentDescription": "Агент для отправки запросов",
+      "agentType": "agent_with_tools",
+      "servers": [
+        "mcp_server_2"
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "serverName": "mcp_server_1",
+      "tools": [
+        {
+          "toolName": "test_get",
+          "toolType": "get_mcp_template",
+          "toolDescription": "TEST GET MCP TOOL"
+        }
+      ]
+    },
+    {
+      "serverName": "mcp_server_2",
+      "tools": [
+        {
+          "toolName": "test_post",
+          "toolType": "post_mcp_template",
+          "toolDescription": "TEST POST MCP TOOL",
+          "params": [
+            "data"
+          ]
+        }
+      ]
+    }
+  ]
+}

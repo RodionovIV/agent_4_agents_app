@@ -1,13 +1,13 @@
 import os
 import subprocess
 from copy import deepcopy
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from jinja2 import Environment, FileSystemLoader
 
 from agents.tools.script_tools.agent_config_parser import ConfigParser
 from agents.tools.script_tools.file_processor import FileProcessor
-from settings import CODE_TEMPLATES, templates_dir
+from settings import CODE_TEMPLATES, git_repo, templates_dir
 from utils.cutomLogger import customLogger
 
 _LOGGER = customLogger.getLogger(__name__)
@@ -16,7 +16,7 @@ env = Environment(loader=FileSystemLoader(templates_dir))
 
 class Generator:
     def __init__(self, project_name, agent_config):
-        self.project = project_name
+        self.project = os.path.join(git_repo, project_name)
         self.config = deepcopy(CODE_TEMPLATES)
         self.agent_config = agent_config
 
@@ -142,8 +142,8 @@ class Generator:
         tree = result.stdout
         base_path = os.path.basename(project_path)
         tree = tree.replace(project_path, base_path)
-        desc = self.agent_config.get("project_desc", "")
-        project_name = self.agent_config.get("project_name", "")
+        desc = self.agent_config.get("projectDesc", "")
+        project_name = self.agent_config.get("projectName", "")
         readme_txt = readme_template.render(
             project_name=project_name, description=desc, tree=tree
         )

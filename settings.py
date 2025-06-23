@@ -11,6 +11,7 @@ tools_dir = base_dir + "/agents/tools/mcp_tools/"
 templates_dir = base_dir + "/templates"
 
 # MCP Tools
+config_mcp_tool = tools_dir + "config_validator_mcp_tool.py"
 planer_mcp_tool = tools_dir + "test_planer_mcp.py"
 coder_mcp_tool = tools_dir + "test_coder_mcp.py"
 git_mcp_tool = tools_dir + "test_git_mcp.py"
@@ -50,6 +51,11 @@ BA_PROMPT_PATH = "prompts/ba_prompt.txt"
 SA_INSTRUCTION_PATH = "instructions/sa_instruction.md"
 SA_PROMPT_PATH = "prompts/sa_prompt.txt"
 
+CONFIG_SPECIFICATION_PATH = "instructions/config_specification.json"
+CONFIG_EXAMPLE_WORKFLOW_PATH = "instructions/config_workflow_example.json"
+CONFIG_EXAMPLE_ORCHESTRATOR_PATH = "instructions/config_orchestrator_example.json"
+CONFIG_PROMPT_PATH = "prompts/config_generator_prompt.txt"
+
 PL_PROMPT_PATH = "prompts/planer_prompt.txt"
 CODER_PROMPT_PATH = "prompts/coder_prompt.txt"
 GIT_PROMPT_PATH = "prompts/git_prompt.txt"
@@ -65,9 +71,15 @@ ba_prompt = __read_doc(BA_PROMPT_PATH)
 sa_instruction = __read_doc(SA_INSTRUCTION_PATH)
 sa_prompt = __read_doc(SA_PROMPT_PATH)
 
+config_specification = __read_json(CONFIG_SPECIFICATION_PATH)
+config_example_orchestrator = __read_json(CONFIG_EXAMPLE_ORCHESTRATOR_PATH)
+config_example_workflow = __read_json(CONFIG_EXAMPLE_WORKFLOW_PATH)
+config_prompt = __read_doc(CONFIG_PROMPT_PATH)
+
 pl_prompt = __read_doc(PL_PROMPT_PATH)
 coder_prompt = __read_doc(CODER_PROMPT_PATH)
 git_prompt = __read_doc(GIT_PROMPT_PATH)
+git_repo = "/media/ts777/Kingston/Sandbox/agent-sandbox"  # "/app/sandbox"
 
 llm = GigaChat(
     model="GigaChat-2-Max",

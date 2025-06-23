@@ -1,3 +1,4 @@
+import json
 import re
 
 
@@ -14,3 +15,12 @@ class Parser:
             return matches.group(1)
         else:
             return None
+
+    @staticmethod
+    def parse_json(text: str):
+        match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
+        result = text
+        if match:
+            result_str = match.group(1)
+            result = json.loads(result_str)
+        return result

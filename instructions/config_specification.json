@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "projectName",
+    "projectDesc",
+    "systemType",
+    "graph",
+    "agents",
+    "servers"
+  ],
+  "properties": {
+    "projectName": {
+      "type": "string"
+    },
+    "projectDesc": {
+      "type": "string"
+    },
+    "systemType": {
+      "type": "string",
+      "enum": [
+        "workflow",
+        "orchestrator"
+      ]
+    },
+    "graph": {
+      "type": "object",
+      "required": [
+        "initialState",
+        "nodes"
+      ],
+      "properties": {
+        "initialState": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "to"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "agentName",
+          "agentDescription",
+          "agentType",
+          "servers"
+        ],
+        "properties": {
+          "agentName": {
+            "type": "string"
+          },
+          "agentDescription": {
+            "type": "string"
+          },
+          "agentType": {
+            "type": "string",
+            "enum": [
+              "agent_with_tools",
+              "agent_orchestrator"
+            ]
+          },
+          "servers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "serverName",
+          "tools"
+        ],
+        "properties": {
+          "serverName": {
+            "type": "string"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "toolName",
+                "toolType",
+                "toolDescription"
+              ],
+              "properties": {
+                "toolName": {
+                  "type": "string"
+                },
+                "toolType": {
+                  "type": "string"
+                },
+                "toolDescription": {
+                  "type": "string"
+                },
+                "params": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

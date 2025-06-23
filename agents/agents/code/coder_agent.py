@@ -1,15 +1,18 @@
-from agents.tools.mcp_tools.tools import client
-from utils.cutomLogger import customLogger
-from settings import llm, coder_prompt, git_prompt
-
-from langgraph.prebuilt import create_react_agent
-from langchain.schema import HumanMessage
-
-from langgraph.checkpoint.memory import MemorySaver
-
-import re
+from typing import List, TypedDict
 from uuid import uuid4
-from typing import TypedDict
+
+from langchain.schema import HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.prebuilt import create_react_agent
+
+import settings
+from agents.tools.mcp_tools.tools import client
+from agents.tools.script_tools.generator import Generator
+from agents.utils.parser import Parser
+from agents.utils.text_formatter import TextFormatter
+from settings import (config_example_orchestrator, config_example_workflow,
+                      config_prompt, config_specification, git_prompt, llm)
+from utils.cutomLogger import customLogger
 
 _LOGGER = customLogger.getLogger(__name__)
 
@@ -18,6 +21,11 @@ POSTFIX = "\n\nИсправь, пожалуйста, и сгенерируй к�
 
 class CoAgentState(TypedDict):
     task: str
+    config_task: str
+    git_task: str
+    config_result: str
+    git_result: str
+    messages: List
     repo_name: str
 
 
@@ -26,90 +34,91 @@ class CoAgent:
         pass
 
     async def create(self):
-        coder_tools = await client.get_tools(server_name="coder")
+        config_tools = await client.get_tools(server_name="config")
         git_tools = await client.get_tools(server_name="git")
 
-        llm_with_functions = llm.bind_functions(coder_tools)
-        self.coder_agent = create_react_agent(
-            llm, coder_tools, checkpointer=MemorySaver()
+        self.config_agent = create_react_agent(
+            llm, config_tools, checkpointer=MemorySaver()
         )
 
-        llm_with_functions = llm.bind_functions(git_tools)
         self.git_agent = create_react_agent(llm, git_tools, checkpointer=MemorySaver())
 
-    async def run_qa_agent(self, state: CoAgentState, config: dict):
+    async def run_config_agent(self, state: CoAgentState, config: dict):
+        class_name = self.__class__.__name__.lower() + "_config"
         _LOGGER.info(
-            f"Status: coder_agent, thread_id: {config['configurable']['thread_id']}"
+            f"Status: {class_name}, thread_id: {config['configurable']['thread_id']}"
         )
-        # state["questions"] = ""
+
         if "messages" in state and state["messages"]:
             old_messages = state["messages"]
             request = state["messages"][-1].content + POSTFIX
 
         else:
             old_messages = []
-            request = state["task"]
-        _LOGGER.info(f"CODER REQUEST: {request}")
-        request = {"messages": [HumanMessage(content=request)]}
-        response = await self.coder_agent.ainvoke(request, config=config)
-        git_config = {
-            "configurable": {"thread_id": str(uuid4())},
-            "recursion_limit": 100,
-        }
-        git_message = {
-            "messages": [
-                HumanMessage(content=git_prompt.format(project_name=state["repo_name"]))
-            ]
-        }
+            request = state["config_task"]
+
+        _LOGGER.info(f"{class_name}_request: {request}")
+        request = TextFormatter.agent_request(request)
+        response = await self.config_agent.ainvoke(request, config=config)
+
         if isinstance(response, dict):
             result = response["messages"][-1].content
         else:
             result = response
-        _LOGGER.info(f"CODER RESPONSE: {result}")
+        _LOGGER.info(f"{class_name}_response: {result}")
 
-        response = await self.git_agent.ainvoke(git_message, config=git_config)
-        if isinstance(response, dict):
-            result = response["messages"][-1].content
-        else:
-            result = response
-        _LOGGER.info(f"GIT RESPONSE: {result}")
-
-        matches = re.findall(r"\[ВОПРОС\](.*?)\[/ВОПРОС\]", result, re.DOTALL)
+        matches = Parser.parse_question(result)
         if matches:
-            ques_string = [f"{i + 1}. {s}" for i, s in enumerate(matches)]
-            state["questions"] = "Возникли вопросы:\n" + "\n".join(ques_string)
+            questions = TextFormatter.format_questions(matches)
+            state["questions"] = "Возникли вопросы:\n" + "\n".join(questions)
         else:
-            state["result"] = result
+            state["config_result"] = result
         state["messages"] = old_messages + [
             HumanMessage(content=result, name="Аналитик")
         ]
         return state
 
-    def add_message(self, state: CoAgentState, msg: str):
-        if "messages" in state and state["messages"]:
-            old_messages = state["messages"]
+    async def run_git_agent(self, state: CoAgentState):
+        class_name = self.__class__.__name__.lower() + "_git"
+        _LOGGER.info(f"Status: {class_name}")
+        git_config = {
+            "configurable": {"thread_id": str(uuid4())},
+            "recursion_limit": 100,
+        }
+        request = state["git_task"]
+        request = TextFormatter.agent_request(request)
+
+        response = await self.git_agent.ainvoke(request, config=git_config)
+        if isinstance(response, dict):
+            result = response["messages"][-1].content
         else:
-            old_messages = []
-        state["messages"] = old_messages + [HumanMessage(content=msg)]
+            result = response
+        _LOGGER.info(f"{class_name}_response: {result}")
+        state["git_result"] = result
         return state
 
-    def get_result(self, state: CoAgentState):
-        if "result" in state and state["result"]:
-            return {"status": "OK", "content": state["result"]}
-        elif "questions" in state and state["questions"]:
-            return {"status": "QUES", "content": state["questions"]}
-        else:
-            return {"status": "FAIL", "content": "Возникла ошибка"}
+    async def run_agent(self, state: CoAgentState, config: dict):
+        state = await self.run_config_agent(state, config)
+        agent_config = Parser.parse_json(state["config_result"])
+        project_name = state["repo_name"]
+        generator = Generator(project_name, agent_config)
+        generator.generate()
+        state = await self.run_git_agent(state)
+        return state
 
     async def run(self, msg: str, state: CoAgentState, config: dict):
         if "messages" not in state or not state["messages"]:
             await self.create()
-            state["task"] = coder_prompt.format(
-                plan=state["task"], project_name=state["repo_name"]
+            state["config_task"] = config_prompt.format(
+                json_spec=str(config_specification),
+                description=state["task"],
+                workflow_example=str(config_example_workflow),
+                orchestrator_example=str(config_example_orchestrator),
+            )
+            state["git_task"] = git_prompt.format(
+                git_repo=settings.git_repo, project_name=state["repo_name"]
             )
         else:
-            state = self.add_message(state, msg)
-        state = await self.run_qa_agent(state, config)
-        # response = self.get_result(state)
-        # response["state"] = state
+            state = TextFormatter.add_message(state, msg)
+        await self.run_agent(state, config)
         return {"status": "OK"}
