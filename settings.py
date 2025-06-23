@@ -132,7 +132,7 @@ RESPONSE_STATUS = {
     "BA": "Бизнес-требования сгенерированы",
     "SA": "Системные требования сгенерированы",
     "PL": "План разработки составлен",
-    "CO": "Код сгенерирован и запушен в https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}",
+    "CO": "Статус: {response}\nРепозиторий: https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}",
 }
 
 NEXT_TASK = {

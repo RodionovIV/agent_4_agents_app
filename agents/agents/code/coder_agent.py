@@ -120,5 +120,5 @@ class CoAgent:
             )
         else:
             state = TextFormatter.add_message(state, msg)
-        await self.run_agent(state, config)
-        return {"status": "OK"}
+        state = await self.run_agent(state, config)
+        return state["git_result"]
