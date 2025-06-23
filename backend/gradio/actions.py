@@ -59,7 +59,6 @@ async def action_push_submit_button(user_input, state):
             }
             state["messages"].append(ai_message)
         else:
-            print(state)
             state["gen_precondition"] = True
     else:
         msg = settings.REQUIRED_MSGS[curent_status]
