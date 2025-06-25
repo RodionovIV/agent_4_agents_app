@@ -85,7 +85,7 @@ config_prompt = __read_doc(CONFIG_PROMPT_PATH)
 pl_prompt = __read_doc(PL_PROMPT_PATH)
 coder_prompt = __read_doc(CODER_PROMPT_PATH)
 git_prompt = __read_doc(GIT_PROMPT_PATH)
-git_repo = os.getenv("SANDBOX_REPO")#"/app/sandbox"
+git_repo = "/app/sandbox" #os.getenv("SANDBOX_REPO")
 
 llm = GigaChat(
     model="GigaChat-2-Max",

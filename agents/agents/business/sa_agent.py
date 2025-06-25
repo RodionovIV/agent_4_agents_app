@@ -52,7 +52,7 @@ class SaAgent(AbstractAgent):
         matches = Parser.parse_question(result)
         if matches and not flag:
             questions = TextFormatter.format_questions(matches)
-            state["questions"] = "Возникли вопросы:\n" + "\n".join(questions)
+            state["questions"] = "Возникли вопросы:\n" + questions
         else:
             state["result"] = result
         state["messages"] = old_messages + [
