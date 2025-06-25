@@ -1,7 +1,10 @@
 import json
 import os
 
+from dotenv import load_dotenv
 from langchain_gigachat.chat_models import GigaChat
+
+load_dotenv()
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = base_dir + "/tmp"
@@ -30,6 +33,9 @@ def __read_json(path):
     with open(path, mode="r") as f:
         return json.load(f)
 
+def __full_path(path):
+    return os.path.join(base_dir, path)
+
 
 CODE_TEMPLATES = {
     k: {
@@ -40,25 +46,25 @@ CODE_TEMPLATES = {
     }
     for k, v in __read_json(code_config).items()
 }
-DESC_PROMPT_PATH = "prompts/desc_prompt.txt"
-DESC_INSTRUMENTS_PATH = "instructions/desc_instruments.txt"
+DESC_PROMPT_PATH = __full_path("prompts/desc_prompt.txt")
+DESC_INSTRUMENTS_PATH = __full_path("instructions/desc_instruments.txt")
 
-GRAPH_PROMPT_PATH = "prompts/graph_prompt.txt"
+GRAPH_PROMPT_PATH = __full_path("prompts/graph_prompt.txt")
 
-BA_INSTRUCTION_PATH = "instructions/ba_instruction.md"
-BA_PROMPT_PATH = "prompts/ba_prompt.txt"
+BA_INSTRUCTION_PATH = __full_path("instructions/ba_instruction.md")
+BA_PROMPT_PATH = __full_path("prompts/ba_prompt.txt")
 
-SA_INSTRUCTION_PATH = "instructions/sa_instruction.md"
-SA_PROMPT_PATH = "prompts/sa_prompt.txt"
+SA_INSTRUCTION_PATH = __full_path("instructions/sa_instruction.md")
+SA_PROMPT_PATH = __full_path("prompts/sa_prompt.txt")
 
-CONFIG_SPECIFICATION_PATH = "instructions/config_specification.json"
-CONFIG_EXAMPLE_WORKFLOW_PATH = "instructions/config_workflow_example.json"
-CONFIG_EXAMPLE_ORCHESTRATOR_PATH = "instructions/config_orchestrator_example.json"
-CONFIG_PROMPT_PATH = "prompts/config_generator_prompt.txt"
+CONFIG_SPECIFICATION_PATH = __full_path("instructions/config_specification.json")
+CONFIG_EXAMPLE_WORKFLOW_PATH = __full_path("instructions/config_workflow_example.json")
+CONFIG_EXAMPLE_ORCHESTRATOR_PATH = __full_path("instructions/config_orchestrator_example.json")
+CONFIG_PROMPT_PATH = __full_path("prompts/config_generator_prompt.txt")
 
-PL_PROMPT_PATH = "prompts/planer_prompt.txt"
-CODER_PROMPT_PATH = "prompts/coder_prompt.txt"
-GIT_PROMPT_PATH = "prompts/git_prompt.txt"
+PL_PROMPT_PATH = __full_path("prompts/planer_prompt.txt")
+CODER_PROMPT_PATH = __full_path("prompts/coder_prompt.txt")
+GIT_PROMPT_PATH = __full_path("prompts/git_prompt.txt")
 
 graph_maker_prompt = __read_doc(GRAPH_PROMPT_PATH)
 
@@ -79,7 +85,7 @@ config_prompt = __read_doc(CONFIG_PROMPT_PATH)
 pl_prompt = __read_doc(PL_PROMPT_PATH)
 coder_prompt = __read_doc(CODER_PROMPT_PATH)
 git_prompt = __read_doc(GIT_PROMPT_PATH)
-git_repo = "/app/sandbox"
+git_repo = os.getenv("SANDBOX_REPO")#"/app/sandbox"
 
 llm = GigaChat(
     model="GigaChat-2-Max",
@@ -132,7 +138,12 @@ RESPONSE_STATUS = {
     "BA": "Бизнес-требования сгенерированы",
     "SA": "Системные требования сгенерированы",
     "PL": "План разработки составлен",
-    "CO": "Статус: {response}\n\nРепозиторий: \nhttps://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}",
+    "CO": (
+        'Статус: {response}\n\n'
+        'Репозиторий: \n'
+        '<a href="https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}" target="_blank">'
+        'https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}</a>'
+    )
 }
 
 NEXT_TASK = {

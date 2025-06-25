@@ -1,10 +1,17 @@
-from mcp.server.fastmcp import FastMCP
 import sys
+from pathlib import Path
+
+root = Path(__file__).parents[3]
+sys.path.insert(0, str(root))
 
 import subprocess
-import logging
+import sys
 
-_LOGGER = logging.getLogger(__name__)
+from mcp.server.fastmcp import FastMCP
+
+from utils.cutomLogger import customLogger
+
+_LOGGER = customLogger.getLogger(__name__)
 
 mcp = FastMCP("Git")
 
@@ -99,4 +106,3 @@ def git_remote_add(repo_path, remote_url, branch_name):
 if __name__ == "__main__":
     transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
     mcp.run(transport=transport)
-    # /media/ts777/Kingston/Sandbox/project_1

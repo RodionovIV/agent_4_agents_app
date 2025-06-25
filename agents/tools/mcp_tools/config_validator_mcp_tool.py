@@ -1,68 +1,19 @@
+import sys
+from pathlib import Path
+
+root = Path(__file__).parents[3]
+sys.path.insert(0, str(root))
+
 import json
-import logging
 import re
 import sys
 from json.decoder import JSONDecodeError
-from typing import List, Optional
 from xml.dom import ValidationErr
 
 from mcp.server.fastmcp import FastMCP
-from pydantic import BaseModel, Field, validator
 
-
-class Node(BaseModel):
-    name: str
-    to: str
-
-
-class Graph(BaseModel):
-    initialState: str
-    nodes: List[Node]
-
-
-class Tool(BaseModel):
-    toolName: str
-    toolType: str
-    toolDescription: str
-    params: Optional[List[str]] = Field(default_factory=list)
-
-
-class Server(BaseModel):
-    serverName: str
-    tools: List[Tool]
-
-
-class Agent(BaseModel):
-    agentName: str
-    agentDescription: str
-    agentType: str
-    servers: List[str]
-
-    @validator("agentType")
-    def validate_agent_type(cls, v):
-        allowed = {"agent_with_tools", "orchestrator"}
-        if v not in allowed:
-            raise ValueError(f"agentType must be one of {allowed}")
-        return v
-
-
-class SystemSpec(BaseModel):
-    projectName: str
-    projectDesc: str
-    systemType: str
-    graph: Graph
-    agents: List[Agent]
-    servers: List[Server]
-
-    @validator("systemType")
-    def validate_system_type(cls, v):
-        allowed = {"workflow", "orchestrator"}
-        if v not in allowed:
-            raise ValueError(f"systemType must be one of {allowed}")
-        return v
-
-    class Config:
-        extra = "forbid"
+from agents.tools.mcp_tools.validator.pydantic_validation import SystemSpec
+from utils.cutomLogger import customLogger
 
 
 def parse_json(s: str):
@@ -75,7 +26,7 @@ def parse_json(s: str):
         raise JSONDecodeError("Incorrect JSON")
 
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = customLogger.getLogger(__name__)
 
 
 mcp = FastMCP("config", port="8001")
