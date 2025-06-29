@@ -1,11 +1,13 @@
 import gradio as gr
 
 import settings
-from backend.agent_logic.in_progress import (check_state, router,
-                                             update_progress_html,
-                                             wrapp_header)
-from backend.agent_logic.init import (create_agents, create_filename,
-                                      make_config)
+from backend.agent_logic.in_progress import (
+    check_state,
+    router,
+    update_progress_html,
+    wrapp_header,
+)
+from backend.agent_logic.init import create_agents, create_filename, make_config
 from backend.agent_logic.postprocess import postprocess_response
 from utils.cutomLogger import customLogger
 

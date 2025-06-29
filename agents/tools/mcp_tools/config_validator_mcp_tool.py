@@ -59,6 +59,7 @@ def check_config(config_file):
     finally:
         return result
 
+
 if __name__ == "__main__":
     transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
     mcp.run(transport=transport)
