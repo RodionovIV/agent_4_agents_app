@@ -40,6 +40,7 @@ class PlAgentState(TypedDict):
 
 class CoAgentState(TypedDict):
     task: str
+    desc: str
     config_task: str
     git_task: str
     config_result: str

@@ -48,10 +48,9 @@ class Agent(BaseModel):
 
     @field_validator("agentName")
     def validate_agent_name(cls, v):
-        if not re.fullmatch(r'[A-Za-z]+', v):
+        if not re.fullmatch(r"[A-Za-z]+", v):
             raise ValueError("agentName must contain only English letters (A-Z, a-z)")
         return v
-
 
 
 class SystemSpec(BaseModel):

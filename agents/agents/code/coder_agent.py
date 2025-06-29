@@ -1,8 +1,10 @@
 import settings as s
 from agents.agents.code.config_agent import ConfigAgent
 from agents.agents.code.git_agent import GitAgent
+from agents.agents.code.prompt_agent import PromptAgent
 from agents.agents.states import CoAgentState
 from agents.tools.script_tools.generator import Generator
+from agents.tools.script_tools.prompt_processor import PromptProcessor
 from agents.utils.parser import Parser
 from agents.utils.text_formatter import TextFormatter
 from utils.cutomLogger import customLogger
@@ -14,6 +16,7 @@ class CoAgent:
     def __init__(self):
         self.config_agent = ConfigAgent()
         self.git_agent = GitAgent()
+        self.prompt_agent = PromptAgent()
 
     async def create(self):
         await self.config_agent.create()
@@ -22,6 +25,11 @@ class CoAgent:
     async def run_agent(self, state: CoAgentState, config: dict):
         state = await self.config_agent.run_agent(state, config)
         agent_config = Parser.parse_json(state["config_result"])
+        agent_tasks = PromptProcessor.generate(state["desc"], agent_config)
+        agent_prompts = await self.prompt_agent.run(agent_tasks)
+        agent_config = PromptProcessor.add_prompts_to_config(
+            agent_prompts, agent_config
+        )
         project_name = state["repo_name"]
         generator = Generator(project_name, agent_config)
         generator.generate()

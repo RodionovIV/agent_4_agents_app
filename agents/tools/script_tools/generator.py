@@ -221,6 +221,19 @@ class Generator:
         template_name = "TEMPLATE_MODELS_AGENT"
         self._generate_text_template(template_name)
 
+    def generate_prompts(self):
+        template_name = "TEMPLATE_PROMPT"
+        for agent in self.agent_config["agents"]:
+            agent_name = agent["agentName"]
+            prompt = agent.get("agentPrompt", "")
+            output_file = self.get_path(
+                template_name, kwargs={"agent_name": agent_name}
+            )
+            FileProcessor.save_str(output_file, prompt)
+            _LOGGER.info(
+                f"Промпт для агента {agent_name} сгенерирован и сохранен в {output_file}"
+            )
+
     def generate(self) -> None:
         self.generate_mcp()
         self.generate_graph()
@@ -234,5 +247,6 @@ class Generator:
         self.generate_requiremets()
         self.generate_docker_file()
         self.generate_main()
+        self.generate_prompts()
 
         _LOGGER.info(f"Проект сгенерирован и сохранен в {self.project}")

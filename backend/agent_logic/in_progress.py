@@ -23,6 +23,7 @@ def save_desc_state(state):
             "task"
         ]
         state["agent_states"][next_status]["description"] = state["results"][cur_status]
+        state["agent_states"]["CO"]["desc"] = state["results"][cur_status]
         generate = True
     state["gen_precondition"] = generate
     return state
@@ -125,4 +126,5 @@ def check_state(cur_status, user_input, current_state):
             current_state["repo_name"] = user_input
         elif "task" not in current_state or not current_state["task"]:
             current_state["task"] = user_input
+            current_state["desc"] = user_input
     return current_state
