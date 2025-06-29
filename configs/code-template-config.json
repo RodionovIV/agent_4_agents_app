@@ -58,5 +58,9 @@
   "TEMPLATE_ENV": {
     "template": "null",
     "path": "{project}/.env"
+  },
+  "TEMPLATE_PROMPT": {
+    "template": "null",
+    "path": "{project}/prompts/{agent_name}_prompt.txt"
   }
 }
