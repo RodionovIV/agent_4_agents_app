@@ -13,6 +13,7 @@ from xml.dom import ValidationErr
 from mcp.server.fastmcp import FastMCP
 
 from agents.tools.mcp_tools.validator.pydantic_validation import SystemSpec
+from agents.tools.mcp_tools.validator.smart_validator import SmartValidator
 from utils.cutomLogger import customLogger
 
 
@@ -42,6 +43,7 @@ def check_config(config_file):
     try:
         file = parse_json(config_file)
         spec = SystemSpec(**file)
+        SmartValidator.validate_config(config_file)
         result = "CONFIG VALID"
         _LOGGER.info(result)
     except ValidationErr as e:
