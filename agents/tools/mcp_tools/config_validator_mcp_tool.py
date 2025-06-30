@@ -43,7 +43,7 @@ def check_config(config_file):
     try:
         file = parse_json(config_file)
         spec = SystemSpec(**file)
-        SmartValidator.validate_config(config_file)
+        SmartValidator.validate_config(file)
         result = "CONFIG VALID"
         _LOGGER.info(result)
     except ValidationErr as e:
