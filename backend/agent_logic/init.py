@@ -36,6 +36,7 @@ def create_filename(prefix):
 
 def setup_initial_state():
     state = {
+        "session_uuid": "EMPTY",
         "init": False,
         "messages": [],
         "md_value": " ",

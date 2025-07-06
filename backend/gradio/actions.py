@@ -1,4 +1,5 @@
 import gradio as gr
+from uuid import uuid4
 
 import settings
 from backend.agent_logic.in_progress import (
@@ -22,8 +23,10 @@ async def run_agent(current_agent, user_input, current_state, current_config):
 
 async def action_push_submit_button(user_input, state):
     if not state["init"]:
-        _LOGGER.info("Initialize initial state")
+        session_uuid = str(uuid4())
+        _LOGGER.info(f"Initialize state, session: {session_uuid}")
         state["init"] = True
+        state["session_uuid"] = session_uuid
         state["configs"]["DESC"] = make_config()
         state["configs"]["GRAPH"] = make_config()
         state["configs"]["BA"] = make_config()
@@ -46,7 +49,7 @@ async def action_push_submit_button(user_input, state):
     current_state = state["agent_states"][curent_status]
     current_config = state["configs"][curent_status]
 
-    _LOGGER.info(f"CURRENT_AGENT: {curent_status}")
+    _LOGGER.info(f"Session: {state['session_uuid']} Current status: {curent_status}")
     if user_input:
         user_msg = {"role": "user", "content": user_input}
         state["messages"].append(user_msg)
@@ -127,7 +130,7 @@ async def action_click_next_button(state):
             gr.update(**header_params),
         )
         _LOGGER.info(
-            f"Current status {curent_status}, gen_precondition: {state['gen_precondition']}"
+            f"Session: {state['session_uuid']} Current status {curent_status}, gen_precondition: {state['gen_precondition']}"
         )
         if curent_status in {"GRAPH", "BA", "SA", "PL"}:
             current_agent = AGENTS[curent_status]
