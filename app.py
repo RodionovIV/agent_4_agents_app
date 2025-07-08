@@ -33,7 +33,7 @@ def run_web_interface():
         with gr.Row():
             with gr.Column():
                 next_button = gr.Button(
-                    scale=1, value="Следующий шаг -> 🌐 Граф взаимодействий"
+                    scale=1, value="Следующий шаг -> 📊 Бизнес-анализ"
                 )
             with gr.Column():
                 progress_html = gr.HTML(INIT_BAR)

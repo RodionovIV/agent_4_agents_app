@@ -1,3 +1,6 @@
+from settings import STATUS_LIST
+
+
 def wrapp_header(msg):
     return f'<h1 align="center">{msg}</h1>'
 
@@ -19,11 +22,12 @@ def save_desc_state(state):
     next_status = "GRAPH"
     generate = False
     if state["gen_precondition"]:
-        state["agent_states"][next_status]["task"] = state["agent_states"][cur_status][
-            "task"
-        ]
-        state["agent_states"][next_status]["description"] = state["results"][cur_status]
-        state["agent_states"]["CO"]["desc"] = state["results"][cur_status]
+        desc = state["results"]["DESC"]
+        task = state["agent_states"]["DESC"]["task"]
+        state["agent_states"]["BA"]["task"] = desc
+        state["agent_states"]["GRAPH"]["task"] = task
+        state["agent_states"]["GRAPH"]["description"] = desc
+        state["agent_states"]["CO"]["desc"] = desc
         generate = True
     state["gen_precondition"] = generate
     return state
@@ -34,9 +38,7 @@ def save_graph_state(state):
     next_status = "BA"
     generate = False
     if state["gen_precondition"]:
-        desc = state["agent_states"][cur_status]["description"]
-        graph = state["agent_states"][cur_status]["result"]
-        state["agent_states"][next_status]["task"] = desc
+        graph = state["agent_states"]["GRAPH"]["result"]
         state["agent_states"]["CO"]["task"] = graph
         generate = True
     state["gen_precondition"] = generate
@@ -48,10 +50,8 @@ def save_ba_state(state):
     next_status = "SA"
     generate = False
     if state["gen_precondition"]:
-        state["agent_states"][next_status]["description"] = state["agent_states"][
-            cur_status
-        ]["task"]
-        state["agent_states"][next_status]["ba_requirements"] = state["results"]["BA"]
+        state["agent_states"]["SA"]["description"] = state["agent_states"]["BA"]["task"]
+        state["agent_states"]["SA"]["ba_requirements"] = state["results"]["BA"]
         generate = True
     state["gen_precondition"] = generate
     return state
@@ -62,7 +62,7 @@ def save_sa_state(state):
     next_status = "PL"
     generate = False
     if state["gen_precondition"]:
-        state["agent_states"][next_status]["task"] = state["results"]["SA"]
+        state["agent_states"]["PL"]["task"] = state["results"]["SA"]
         generate = True
     state["gen_precondition"] = generate
     return state
@@ -80,20 +80,18 @@ def save_pl_state(state):
 
 def router(state):
     cur_status = state["status"]
+    next_status_idx = STATUS_LIST.index(cur_status) + 1
+    if next_status_idx < len(STATUS_LIST):
+        next_status = STATUS_LIST[next_status_idx]
     if cur_status == "DESC":
-        next_status = "GRAPH"
         state = save_desc_state(state)
     elif cur_status == "GRAPH":
-        next_status = "BA"
         state = save_graph_state(state)
     elif cur_status == "BA":
-        next_status = "SA"
         state = save_ba_state(state)
     elif cur_status == "SA":
-        next_status = "PL"
         state = save_sa_state(state)
     elif cur_status == "PL":
-        next_status = "CO"
         state = save_pl_state(state)
     else:
         raise StopIteration
