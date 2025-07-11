@@ -16,8 +16,7 @@ env = Environment(loader=FileSystemLoader(templates_dir))
 
 class Generator:
     def __init__(self, project_name, agent_config):
-        # self.project = os.path.join(git_repo, project_name)
-        self.project = project_name
+        self.project = os.path.join(git_repo, project_name)
         self.config = deepcopy(CODE_TEMPLATES)
         self.agent_config = agent_config
 

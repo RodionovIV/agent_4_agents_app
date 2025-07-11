@@ -11,7 +11,7 @@ def {{ agent_name }}_node(agent):
 
         goto = {{ '"' + direction + '"' if direction != 'END' else direction }}
         if goto == END:
-            new_state["result"] = new_state["result_field"]
+            new_state["result"] = new_state[result_field]
         return Command(
             update={
                 k:v for k, v in new_state.items()
