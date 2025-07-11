@@ -60,7 +60,7 @@
     "path": "{project}/.env"
   },
   "TEMPLATE_PROMPT": {
-    "template": "null",
+    "template": "agents/prompts/template_orchestrator_postfix.txt.jinja2",
     "path": "{project}/prompts/{agent_name}_prompt.txt"
   }
 }

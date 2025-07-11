@@ -24,7 +24,7 @@ def {{ agent_name }}_node(agent):
 {% macro agent_orchestrator(agent_name, direction) %}
 {%- set direction_with_end = direction if "END" in direction else direction + [END] -%}
 def {{ agent_name }}_node(agent):
-    async def create_node(state:AgentState)->Command[Literal[{{ direction_with_end | map('tojson') | join(', ') }}]]:
+    async def create_node(state:AgentState)->Command[Literal[{{ direction_with_end | reject('equalto', 'END') | map('tojson') | join(', ') }}, END]]:
         node_name = "{{ agent_name }}_node"
         task_field = "{{ agent_name }}_task"
         result_field = "{{ agent_name }}_result"
@@ -34,15 +34,15 @@ def {{ agent_name }}_node(agent):
             new_state = await agent.run_agent(state)
             tmp_result = parse_question(new_state[result_field])
             if tmp_result:
-                break
-            else:
                 new_state[result_field] = tmp_result["result"]
                 goto = tmp_result["next"]
+                break
         else:
             new_state[result_field] = "FAIL"
+            goto = "END"
+        if goto == "END":
+            new_state["result"] = new_state[result_field]
             goto = END
-        if goto == END:
-            result = new_state[result_field]
         return Command(
             update={
                 k:v for k, v in new_state.items()

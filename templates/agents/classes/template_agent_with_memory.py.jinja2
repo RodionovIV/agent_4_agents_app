@@ -20,7 +20,7 @@ class {{ agent_name|title|replace(" ", "") }}Agent:
         tools = []
         for server_name in {{ server_names }}:
             tools += await client.get_tools(server_name=server_name)
-        self.agent = create_react_agent(llm, tools, checkpointer=MemorySaver())
+        self.agent = create_react_agent(llm, tools, checkpointer=MemorySaver(), prompt={{ agent_name }}_prompt)
         self.config = {
                 "configurable": {
                 "thread_id": str(uuid4())

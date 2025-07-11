@@ -1,0 +1,16 @@
+
+
+
+Ответ дай в формате JSON с ключами "next" - кому передать следующему:
+{% for agent, description in pairs -%}
+- "{{ agent }}" - {{ description }}
+{% endfor %}
+- "END" - если задача решена.
+и "result" - сформулируй в этом поле задачу для агента.
+Пример:
+```json
+{
+    "next": "translator",
+    "result": "Переведи текст"
+}
+```

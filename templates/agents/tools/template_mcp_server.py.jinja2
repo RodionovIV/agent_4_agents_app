@@ -1,10 +1,14 @@
-import json
 import os
 import sys
 
 import requests
+import logging
+from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
+
+load_dotenv()
+_LOGGER = logging.getLogger(__name__)
 mcp = FastMCP("{{ server_name }}", port={{ port|default(8000) }})
 
 {{ tools_code }}

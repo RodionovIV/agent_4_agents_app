@@ -20,14 +20,14 @@ def {{ function_name }}({{ args|default("") }}):
 def {{ function_name }}({{ args|default("") }}):
     """{{ description }}"""
     try:
-        url = os.getenv("{{ function_name|upper }}")
+        url = os.getenv("{{ function_name|upper }}_URL")
         response = requests.get(url)
-        print(f"Вызван get-tool для url {url}")
+        _LOGGER.info(f"Вызван get-tool для url {url}")
         response.raise_for_status()
         return response.text
     except requests.exceptions.RequestException as e:
         e_str = f"Ошибка при отправлении запроса: {e}"
-        print(e_str)
+        _LOGGER.error(e_str)
         return e_str
 {% endmacro %}
 
@@ -40,11 +40,11 @@ def {{ function_name }}({{ args|default("data") }}):
         headers = {"Content-Type": "application/json"}
         data = json.dumps(data)
         response = requests.post(url, data, headers=headers)
-        print(f"Вызван post-tool для url {url}")
+        _LOGGER.info(f"Вызван post-tool для url {url}")
         response.raise_for_status()
         return response.text
     except requests.exceptions.RequestException as e:
         e_str = f"Ошибка при отправлении запроса: {e}"
-        print(e_str)
+        _LOGGER.error(e_str)
         return e_str
 {% endmacro %}

@@ -16,7 +16,8 @@ env = Environment(loader=FileSystemLoader(templates_dir))
 
 class Generator:
     def __init__(self, project_name, agent_config):
-        self.project = os.path.join(git_repo, project_name)
+        # self.project = os.path.join(git_repo, project_name)
+        self.project = project_name
         self.config = deepcopy(CODE_TEMPLATES)
         self.agent_config = agent_config
 
@@ -119,7 +120,8 @@ class Generator:
         template_name = "TEMPLATE_ENDPOINTS"
         output_file = self.get_path(template_name)
         template = self.get_template(template_name)
-        endpoints_code = template.render()
+        initial_state = self.agent_config["graph"]["initialState"]
+        endpoints_code = template.render(initial_state=initial_state)
         FileProcessor.save_str(output_file, endpoints_code)
         _LOGGER.info(f"Agent Endpoints записан в файл {output_file}")
 
@@ -155,7 +157,7 @@ class Generator:
         output_file = self.get_path(template_name)
         functions = ConfigParser.get_all_tools(self.agent_config)
         valid_types = {"get_mcp_template", "post_mcp_template"}
-        _functions = []
+        _functions = ["GIGACHAT_CREDENTIALS="]
         for function in functions:
             if function["toolType"] in valid_types:
                 url = (function["toolName"] + '_url=""').upper()
@@ -221,11 +223,24 @@ class Generator:
         template_name = "TEMPLATE_MODELS_AGENT"
         self._generate_text_template(template_name)
 
+    def generate_orchestrator_postfix(self):
+        template_name = "TEMPLATE_PROMPT"
+        template = self.get_template(template_name)
+        agent_names, agent_descriptions = [], []
+        for agent in self.agent_config["agents"]:
+            if agent["agentName"] != "orchestrator":
+                agent_names.append(agent["agentName"])
+                agent_descriptions.append(agent["agentDescription"])
+        pairs = zip(agent_names, agent_descriptions)
+        return template.render(pairs=pairs)
+
     def generate_prompts(self):
         template_name = "TEMPLATE_PROMPT"
         for agent in self.agent_config["agents"]:
             agent_name = agent["agentName"]
             prompt = agent.get("agentPrompt", "")
+            if agent_name=="orchestrator":
+                prompt += self.generate_orchestrator_postfix()
             output_file = self.get_path(
                 template_name, kwargs={"agent_name": agent_name}
             )

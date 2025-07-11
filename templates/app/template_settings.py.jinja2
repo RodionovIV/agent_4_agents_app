@@ -1,7 +1,10 @@
 import os
 from functools import lru_cache
+from dotenv import load_dotenv
 
 from langchain_gigachat.chat_models import GigaChat
+
+load_dotenv()
 
 # Application settings
 LOG_FILE = "app.log"
@@ -12,7 +15,7 @@ def __read_doc(path):
         return f.read()
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-tools_dir = base_dir + "/services/"
+tools_dir = base_dir + "/services/mcp/"
 
 # MCP Tools
 {%- for server_name in servers %}
