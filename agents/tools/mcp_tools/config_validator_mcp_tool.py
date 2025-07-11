@@ -50,7 +50,7 @@ def check_config(config_file):
         result = f"Validation failed: {e}"
         _LOGGER.info(result)
     except JSONDecodeError as e:
-        result = f"Incorrect JSON. Check it."
+        result = f"String doesn't match with regexp pattern r'```json\s*(.*?)\s*'```."
         _LOGGER.info(result)
     except SyntaxError as e:
         result = f"Request failed: config must contain ```json. {e}"
