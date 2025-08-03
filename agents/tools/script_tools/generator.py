@@ -1,5 +1,4 @@
 import os
-import subprocess
 from copy import deepcopy
 from typing import Dict, List
 
@@ -7,8 +6,10 @@ from jinja2 import Environment, FileSystemLoader
 
 from agents.tools.script_tools.agent_config_parser import ConfigParser
 from agents.tools.script_tools.file_processor import FileProcessor
+from agents.utils.tree_builder import Tree
 from settings import CODE_TEMPLATES, git_repo, templates_dir
 from utils.cutomLogger import customLogger
+
 
 _LOGGER = customLogger.getLogger(__name__)
 env = Environment(loader=FileSystemLoader(templates_dir))
@@ -19,6 +20,7 @@ class Generator:
         self.project = os.path.join(git_repo, project_name)
         self.config = deepcopy(CODE_TEMPLATES)
         self.agent_config = agent_config
+        self.result_dict = dict()
 
     def get_template(self, template_name):
         return env.get_template(self.config[template_name]["template"])
@@ -31,6 +33,10 @@ class Generator:
             kwargs = dict()
         kwargs["project"] = self.project
         return self.config[template_name]["path"].format(**kwargs)
+
+    def save_to_dict(self, filename: str, content: str) -> None:
+        base_filename = filename.replace(f"{self.project}/", "")
+        self.result_dict[base_filename] = content
 
     def generate_mcp_server(
         self, functions: List[Dict[str, str]], server_name: str
@@ -63,7 +69,7 @@ class Generator:
             server_name=server_name, tools_code=tools_code
         )
         # Запись в файл
-        FileProcessor.save_str(output_file, server_code)
+        self.save_to_dict(output_file, server_code)
 
         _LOGGER.info(f"MCP Server успешно записан в {output_file}")
 
@@ -72,7 +78,7 @@ class Generator:
         output_file = self.get_path(template_name)
         template_server = self.get_template(template_name)
         config_str = template_server.render(tools=tools)
-        FileProcessor.save_str(output_file, config_str)
+        self.save_to_dict(output_file, config_str)
         _LOGGER.info(f"MCP Client записан в файл {output_file}")
 
     def generate_mcp(self):
@@ -91,7 +97,7 @@ class Generator:
         output_file = self.get_path(template_name)
         template_state = self.get_template(template_name)
         state_str = template_state.render(agents=agents)
-        FileProcessor.save_str(output_file, state_str)
+        self.save_to_dict(output_file, state_str)
         _LOGGER.info(f"Agent State записан в файл {output_file}")
 
     def generate_agent(self, agent_name: str, server_names: List[str]) -> None:
@@ -101,7 +107,7 @@ class Generator:
         state_str = template_state.render(
             agent_name=agent_name, server_names=server_names
         )
-        FileProcessor.save_str(output_file, state_str)
+        self.save_to_dict(output_file, state_str)
         _LOGGER.info(f"Agent Class записан в файл {output_file}")
 
     def generate_agents(self) -> None:
@@ -121,7 +127,7 @@ class Generator:
         template = self.get_template(template_name)
         initial_state = self.agent_config["graph"]["initialState"]
         endpoints_code = template.render(initial_state=initial_state)
-        FileProcessor.save_str(output_file, endpoints_code)
+        self.save_to_dict(output_file, endpoints_code)
         _LOGGER.info(f"Agent Endpoints записан в файл {output_file}")
 
     def generate_settings(self) -> None:
@@ -131,24 +137,21 @@ class Generator:
         agents = ConfigParser.get_agent_names(self.agent_config)
         servers = ConfigParser.get_server_names(self.agent_config)
         settings_code = template.render(agents=agents, servers=servers)
-        FileProcessor.save_str(output_file, settings_code)
+        self.save_to_dict(output_file, settings_code)
         _LOGGER.info(f"Settings записан в файл {output_file}")
 
     def generate_readme(self) -> None:
-        project_path = self.project
         template_name = "TEMPLATE_README"
         output_file = self.get_path(template_name)
         readme_template = self.get_template(template_name)
-        result = subprocess.run(["tree", project_path], capture_output=True, text=True)
-        tree = result.stdout
-        base_path = os.path.basename(project_path)
-        tree = tree.replace(project_path, base_path)
+        files = list(self.result_dict.keys())
+        tree = Tree.create(files)
         desc = self.agent_config.get("projectDesc", "")
         project_name = self.agent_config.get("projectName", "")
         readme_txt = readme_template.render(
             project_name=project_name, description=desc, tree=tree
         )
-        FileProcessor.save_str(output_file, readme_txt)
+        self.save_to_dict(output_file, readme_txt)
         _LOGGER.info(f"README сгенерирован и сохранен в {output_file}")
 
     def generate_env(self) -> None:
@@ -162,7 +165,7 @@ class Generator:
                 url = (function["toolName"] + '_url=""').upper()
                 _functions += [url]
         env_str = "\n".join(_functions)
-        FileProcessor.save_str(output_file, env_str)
+        self.save_to_dict(output_file, env_str)
         _LOGGER.info(f"env успешно сгенерирован и записан в {output_file}")
 
     def generate_graph(self) -> None:
@@ -198,13 +201,13 @@ class Generator:
         graph_code = template_graph.render(
             agents=agents, nodes_code=nodes_code, initial_state=initial_state
         )
-        FileProcessor.save_str(output_file, graph_code)
+        self.save_to_dict(output_file, graph_code)
         _LOGGER.info(f"Agent Graph успешно записан в {output_file}")
 
     def _generate_text_template(self, template_name):
         output_file = self.get_path(template_name)
         template_text = self.get_template_txt(template_name)
-        FileProcessor.save_str(output_file, template_text)
+        self.save_to_dict(output_file, template_text)
 
     def generate_requiremets(self):
         template_name = "TEMPLATE_REQUIREMENTS"
@@ -243,12 +246,12 @@ class Generator:
             output_file = self.get_path(
                 template_name, kwargs={"agent_name": agent_name}
             )
-            FileProcessor.save_str(output_file, prompt)
+            self.save_to_dict(output_file, prompt)
             _LOGGER.info(
                 f"Промпт для агента {agent_name} сгенерирован и сохранен в {output_file}"
             )
 
-    def generate(self) -> None:
+    def generate(self) -> Dict[str, str]:
         self.generate_mcp()
         self.generate_graph()
         self.generate_agents()
@@ -264,3 +267,4 @@ class Generator:
         self.generate_prompts()
 
         _LOGGER.info(f"Проект сгенерирован и сохранен в {self.project}")
+        return self.result_dict

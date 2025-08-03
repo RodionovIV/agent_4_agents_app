@@ -7,6 +7,7 @@ from agents.tools.script_tools.generator import Generator
 from agents.tools.script_tools.prompt_processor import PromptProcessor
 from agents.utils.parser import Parser
 from agents.utils.text_formatter import TextFormatter
+from agents.tools.script_tools.vc.github import VersionControl
 from utils.cutomLogger import customLogger
 
 _LOGGER = customLogger.getLogger(__name__)
@@ -32,8 +33,11 @@ class CoAgent:
         )
         project_name = state["repo_name"]
         generator = Generator(project_name, agent_config)
-        generator.generate()
-        state = await self.git_agent.run_agent(state)
+        version_control = VersionControl()
+        files = generator.generate()
+        await version_control.run(project_name, files)
+        state["git_result"] = "SUCCESS"
+        # state = await self.git_agent.run_agent(state)
         return state
 
     async def run(self, msg: str, state: CoAgentState, config: dict):

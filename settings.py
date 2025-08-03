@@ -2,7 +2,8 @@ import json
 import os
 
 from dotenv import load_dotenv
-from langchain_gigachat.chat_models import GigaChat
+
+from llm.client import LLM
 
 load_dotenv()
 
@@ -10,6 +11,8 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = base_dir + "/tmp"
 puppeteer_config = base_dir + "/configs/puppeteer-config.json"
 code_config = base_dir + "/configs/code-template-config.json"
+n8n_config = base_dir + "/configs/n8n.json"
+n8n_result_template = base_dir + "/configs/n8n_result_template.json"
 tools_dir = base_dir + "/agents/tools/mcp_tools/"
 templates_dir = base_dir + "/templates"
 
@@ -84,6 +87,8 @@ sa_prompt = __read_doc(SA_PROMPT_PATH)
 config_specification = __read_json(CONFIG_SPECIFICATION_PATH)
 config_example_orchestrator = __read_json(CONFIG_EXAMPLE_ORCHESTRATOR_PATH)
 config_example_workflow = __read_json(CONFIG_EXAMPLE_WORKFLOW_PATH)
+config_n8n = __read_json(n8n_config)
+result_n8n = __read_json(n8n_result_template)
 config_prompt = __read_doc(CONFIG_PROMPT_PATH)
 
 pl_prompt = __read_doc(PL_PROMPT_PATH)
@@ -92,16 +97,7 @@ git_prompt = __read_doc(GIT_PROMPT_PATH)
 prompt_generator_prompt = __read_doc(PROMPT_GENERATOR_PATH)
 git_repo = "/app/sandbox"  # os.getenv("SANDBOX_REPO")
 
-llm = GigaChat(
-    model="GigaChat-2-Max",
-    verify_ssl_certs=False,
-    profanity_check=False,
-    streaming=False,
-    max_tokens=8192,
-    temperature=0.3,
-    repetition_penalty=1.01,
-    timeout=180,
-)
+llm = LLM.gigachat()
 
 # UI Settings
 LOGO_FILE = "src/devil_2_without.png"
@@ -147,8 +143,8 @@ RESPONSE_STATUS = {
     "CO": (
         "Статус: {response}\n\n"
         "Репозиторий: \n"
-        '<a href="https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}" target="_blank">'
-        "https://github.com/RodionovIV/agent-sandbox/tree/main/{project_name}</a>"
+        '<a href="https://github.com/RodionovIV/{project_name}" target="_blank">'
+        "https://github.com/RodionovIV/{project_name}</a>"
     ),
 }
 
