@@ -24,21 +24,25 @@ class CoAgent:
         await self.git_agent.create()
 
     async def run_agent(self, state: CoAgentState, config: dict):
-        state = await self.config_agent.run_agent(state, config)
-        agent_config = Parser.parse_json(state["config_result"])
-        agent_tasks = PromptProcessor.generate(state["desc"], agent_config)
-        agent_prompts = await self.prompt_agent.run(agent_tasks)
-        agent_config = PromptProcessor.add_prompts_to_config(
-            agent_prompts, agent_config
-        )
-        project_name = state["repo_name"]
-        generator = Generator(project_name, agent_config)
-        version_control = VersionControl()
-        files = generator.generate()
-        await version_control.run(project_name, files)
-        state["git_result"] = "SUCCESS"
-        # state = await self.git_agent.run_agent(state)
-        return state
+        try:
+            state = await self.config_agent.run_agent(state, config)
+            agent_config = Parser.parse_json(state["config_result"])
+            agent_tasks = PromptProcessor.generate(state["desc"], agent_config)
+            agent_prompts = await self.prompt_agent.run(agent_tasks)
+            agent_config = PromptProcessor.add_prompts_to_config(
+                agent_prompts, agent_config
+            )
+            project_name = state["repo_name"]
+            generator = Generator(project_name, agent_config)
+            version_control = VersionControl()
+            files = generator.generate()
+            await version_control.run(project_name, files)
+            state["git_result"] = "SUCCESS"
+            state["code"] = files
+        except Exception as e:
+            state["git_result"] = "FAIL"
+        finally:
+            return state
 
     async def run(self, msg: str, state: CoAgentState, config: dict):
         if "messages" not in state or not state["messages"]:
@@ -55,4 +59,7 @@ class CoAgent:
         else:
             state = TextFormatter.add_message(state, msg)
         state = await self.run_agent(state, config)
-        return state["git_result"]
+        return {
+            "msg": state.get("git_result", "Ошибка"),
+            "content": state.get("code")
+        }

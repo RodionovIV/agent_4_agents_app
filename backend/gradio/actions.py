@@ -40,6 +40,7 @@ async def action_push_submit_button(user_input, state):
         state["files"]["BA"] = create_filename("ba_requirements")
         state["files"]["SA"] = create_filename("sa_requirements")
         state["files"]["PL"] = create_filename("dev_plan")
+        state["files"]["CO"] = create_filename("code")
 
         state["mmd"] = create_filename("mermaid")
         state["mmd_picture"] = create_filename("picture")

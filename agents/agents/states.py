@@ -1,4 +1,4 @@
-from typing import List, TypedDict
+from typing import List, TypedDict, Dict
 
 
 class DescAgentState(TypedDict):
@@ -47,3 +47,4 @@ class CoAgentState(TypedDict):
     git_result: str
     messages: List
     repo_name: str
+    code: Dict[str, str]

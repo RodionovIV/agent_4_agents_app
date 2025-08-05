@@ -1,11 +1,15 @@
 import settings
-
+import json
 import subprocess
 
 
 def save_content(content, filename):
     with open(filename, "w") as f:
         f.write(content)
+
+def save_json(content, filename):
+    with open(filename, "w") as f:
+        json.dump(content, f, ensure_ascii=False)
 
 
 def render_mermaid(_input, _output):
@@ -32,8 +36,13 @@ def postprocess_response(state, response):
     if curent_status == "CO":
         repo_name = state["agent_states"][curent_status]["repo_name"]
         msg = settings.RESPONSE_STATUS[curent_status].format(
-            response=response, project_name=repo_name
+            response=response["msg"], project_name=repo_name
         )
+        if response["content"]:
+            state["file_visible_status"] = True
+            save_json(response["content"], state["files"][curent_status])
+            if state["files"][curent_status] not in state["files_visible"]:
+                state["files_visible"].append(state["files"][curent_status])
         return msg, state
     state["agent_states"][curent_status] = response["state"]
     if response["status"] != "OK":

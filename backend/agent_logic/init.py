@@ -31,6 +31,8 @@ def create_filename(prefix):
         return f"{settings.save_dir}/{prefix}_{datetime_str}.mmd"
     elif prefix == "picture":
         return f"{settings.save_dir}/{prefix}_{datetime_str}.png"
+    elif prefix == "code":
+        return f"{settings.save_dir}/{prefix}_{datetime_str}.json"
     return f"{settings.save_dir}/{prefix}_{datetime_str}.md"
 
 
@@ -63,6 +65,7 @@ def setup_initial_state():
             "BA": "EMPTY",
             "SA": "EMPTY",
             "PL": "EMPTY",
+            "CO": "EMPTY"
         },
         "mmd": "EMPTY",
         "mmd_picture": "EMPTY",
